@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  ai-analytics-app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DEFAULT_AI_MODEL=${DEFAULT_AI_MODEL:-gemini}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+    volumes:
+      - ./app/data:/app/app/data:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-analytics-network
+
+  # Optional: Add Redis for caching in future
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - ai-analytics-network
+
+networks:
+  ai-analytics-network:
+    driver: bridge
+
+# volumes:
+#   redis_data:

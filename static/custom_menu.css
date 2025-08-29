@@ -1,0 +1,95 @@
+/* Custom Menu Styling for Streamlit App */
+
+/* Target the main menu list items specifically */
+.main-menu-list li,
+.main-menu-list li *,
+.main-menu-list li a,
+.main-menu-list li span,
+.main-menu-list li div {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    font-weight: 600 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+    margin: 0.25rem 0 !important;
+    transition: all 0.3s ease !important;
+    border: 2px solid transparent !important;
+}
+
+/* Hover effects for menu list items */
+.main-menu-list li:hover,
+.main-menu-list li:hover *,
+.main-menu-list li:hover a,
+.main-menu-list li:hover span,
+.main-menu-list li:hover div {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Target all menu-related elements for consistency */
+.stDeployButton .menu *,
+.stDeployButton .menu .stMarkdown,
+.stDeployButton .menu p,
+.stDeployButton .menu span,
+.stDeployButton .menu div,
+.stDeployButton .menu button,
+.stDeployButton .menu a,
+.stDeployButton .menu label,
+.stDeployButton .menu li {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    font-weight: 600 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+    margin: 0.25rem 0 !important;
+    transition: all 0.3s ease !important;
+    border: 2px solid transparent !important;
+}
+
+/* Hover effects for all menu elements */
+.stDeployButton .menu *:hover,
+.stDeployButton .menu .stMarkdown:hover,
+.stDeployButton .menu p:hover,
+.stDeployButton .menu span:hover,
+.stDeployButton .menu div:hover,
+.stDeployButton .menu button:hover,
+.stDeployButton .menu a:hover,
+.stDeployButton .menu label:hover,
+.stDeployButton .menu li:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Menu container styling */
+.stDeployButton .menu {
+    background-color: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    padding: 0.5rem !important;
+}
+
+/* Ensure menu container has proper styling */
+.menu .block-container {
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+/* Professional focus states for accessibility */
+.stDeployButton .menu .block-container:focus,
+.stDeployButton .menu .stMarkdown > div:focus,
+.stDeployButton .menu .stMarkdown > p:focus {
+    outline: 2px solid #1f77b4 !important;
+    outline-offset: 2px !important;
+    background-color: #e3f2fd !important;
+}
