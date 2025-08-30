@@ -60,6 +60,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def find_data_file():
+    """Search for the data file in various locations"""
+    import glob
+    
+    # Common patterns to search for
+    patterns = [
+        "**/customer_shopping_data.csv",
+        "**/data/customer_shopping_data.csv",
+        "customer_shopping_data.csv",
+        "data/customer_shopping_data.csv"
+    ]
+    
+    for pattern in patterns:
+        matches = glob.glob(pattern, recursive=True)
+        if matches:
+            return matches[0]
+    
+    return None
+
 @st.cache_data(show_spinner="Loading customer shopping data...")
 def load_data():
     """Load and cache the customer shopping data with Streamlit optimization"""
@@ -71,6 +90,15 @@ def load_data():
             "./data/customer_shopping_data.csv",
             os.path.join(os.path.dirname(__file__), "..", "data", "customer_shopping_data.csv"),
             os.path.join(os.getcwd(), "data", "customer_shopping_data.csv"),
+            # Deployment environment paths
+            "/mount/src/mid-alternative-assignment---summer-2025/data/customer_shopping_data.csv",
+            "/app/data/customer_shopping_data.csv",
+            "/workspace/data/customer_shopping_data.csv",
+            # Try to find the file recursively from current directory
+            os.path.join(os.getcwd(), "..", "data", "customer_shopping_data.csv"),
+            os.path.join(os.getcwd(), "..", "..", "data", "customer_shopping_data.csv"),
+            # Try to find the file in the project root
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "customer_shopping_data.csv"),
             "customer_shopping_data.csv"
         ]
         
@@ -81,11 +109,25 @@ def load_data():
                 st.info(f"Found data file at: {data_path}")
                 break
         
+        # If not found in explicit paths, try recursive search
+        if data_path is None:
+            st.info("Data file not found in explicit paths. Trying recursive search...")
+            data_path = find_data_file()
+            if data_path:
+                st.success(f"Found data file via recursive search: {data_path}")
+        
         if data_path is None:
             st.error(f"Data file not found. Tried the following paths:")
             for path in possible_paths:
                 st.write(f"- {path}")
             st.error("Please ensure customer_shopping_data.csv is in the data/ directory.")
+            
+            # Show additional debug info
+            st.info("Additional debugging information:")
+            st.write(f"Current working directory: {os.getcwd()}")
+            st.write(f"Script location: {__file__}")
+            st.write(f"Directory contents: {os.listdir('.')}")
+            
             return None, None
         
         st.success(f"Loading data from: {data_path}")
