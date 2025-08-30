@@ -219,7 +219,7 @@ class CustomerVisualizationTool(BaseTool):
 class CustomerAgentPromptTemplate(StringPromptTemplate):
     """Custom prompt template for the customer shopping agent"""
     
-    template = """You are an intelligent customer shopping data analysis agent. You have access to the following tools:
+    template: str = """You are an intelligent customer shopping data analysis agent. You have access to the following tools:
 
 {tools}
 
