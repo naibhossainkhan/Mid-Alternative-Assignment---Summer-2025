@@ -5,7 +5,7 @@ Demonstrates analytics for customer shopping data without AI dependencies
 
 import sys
 import os
-sys.path.append('src')
+sys.path.append('../src')
 
 import pandas as pd
 import numpy as np

@@ -5,7 +5,12 @@ Supports GPT, Gemini, and Local LLM for text generation
 
 import sys
 import os
-sys.path.append('..')
+
+# Add parent directory to path to find config.py
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
 
 from typing import Dict, Any, Optional
 import pandas as pd

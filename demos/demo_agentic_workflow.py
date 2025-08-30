@@ -8,7 +8,7 @@ Demonstrates the complete Agentic AI pipeline:
 
 import sys
 import os
-sys.path.append('src')
+sys.path.append('../src')
 
 import pandas as pd
 import time
@@ -16,6 +16,9 @@ from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_cu
 from customer_ai_agent import CustomerShoppingAgent
 from visualization import DataVisualizer
 from narrative_generator import NarrativeGenerator
+import sys
+import os
+sys.path.append('..')
 from config import config
 
 def main():

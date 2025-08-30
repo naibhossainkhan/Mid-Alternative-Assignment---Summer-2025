@@ -5,7 +5,7 @@ Demonstrates the structure and approach for generating dataset summaries
 
 import sys
 import os
-sys.path.append('src')
+sys.path.append('../src')
 
 import pandas as pd
 from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data

@@ -1,180 +1,248 @@
 # AI-Powered Customer Shopping Analytics
 
-A production-grade Streamlit application for data analytics and visualization using Generative and Agentic AI technologies.
+A comprehensive data visualization and analytics platform that demonstrates Agentic AI workflows for customer shopping data analysis.
 
-## 🚀 Features
+## 🚀 Quick Start
 
-- **Multi-Model AI Support**: GPT, Gemini, and Local LLM integration
-- **Agentic AI Workflow**: Natural language query processing
-- **Interactive Visualizations**: Plotly charts with AI-generated insights
-- **Responsive Design**: Mobile-friendly interface
-- **Production Ready**: Docker containerization and deployment
+### Prerequisites
+- Python 3.8+
+- pip package manager
 
-## 📋 Requirements
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd "Mid Alternative Assignment - Summer 2025"
 
-- Python 3.11+
-- Docker (for containerized deployment)
-- API Keys for OpenAI and/or Google Gemini
-
-## 🛠️ Installation
-
-### Local Development
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ai-customer-analytics
-   ```
-
-2. **Install dependencies**
-   ```bash
-   make install
-   # or
-   pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env
-   # Edit .env with your API keys
-   ```
-
-4. **Run the application**
-   ```bash
-   make run
-   # or
-   streamlit run app/main.py
-   ```
-
-### Docker Deployment
-
-1. **Build the image**
-   ```bash
-   make build
-   ```
-
-2. **Deploy with Docker Compose**
-   ```bash
-   make deploy
-   ```
-
-3. **Access the application**
-   - Local: http://localhost:8501
-   - Network: http://your-server-ip:8501
-
-## 🏗️ Project Structure
-
-```
-ai-customer-analytics/
-├── app/                          # Main application package
-│   ├── core/                     # Core business logic
-│   │   ├── customer_data_loader.py
-│   │   ├── narrative_generator.py
-│   │   ├── visualization.py
-│   │   ├── ai_provider.py
-│   │   └── customer_ai_agent.py
-│   ├── config/                   # Configuration management
-│   │   ├── settings.py
-│   │   └── production.py
-│   ├── services/                 # Service layer
-│   ├── utils/                    # Utility functions
-│   ├── static/                   # Static assets
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── images/
-│   ├── templates/                # HTML templates
-│   ├── tests/                    # Test suite
-│   │   ├── unit/
-│   │   └── integration/
-│   ├── data/                     # Data files
-│   ├── notebooks/                # Jupyter notebooks
-│   └── main.py                   # Streamlit application
-├── docs/                         # Documentation
-│   ├── api/
-│   ├── deployment/
-│   └── user_guide/
-├── scripts/                      # Utility scripts
-├── deployment/                   # Deployment configurations
-├── Dockerfile                    # Docker configuration
-├── docker-compose.yml           # Docker Compose setup
-├── requirements.txt             # Python dependencies
-├── Makefile                     # Development tasks
-├── run.py                       # Application entry point
-└── README.md                    # This file
+# Install dependencies
+python main.py install
+# or
+pip install -r requirements.txt
 ```
 
-## 🔧 Configuration
+### Running the Application
 
-### Environment Variables
+#### Option 1: Using the Main Launcher (Recommended)
+```bash
+# Run Streamlit app (simple version)
+python main.py streamlit --simple
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OPENAI_API_KEY` | OpenAI API key | Required |
-| `GEMINI_API_KEY` | Google Gemini API key | Required |
-| `DEFAULT_AI_MODEL` | Default AI model | `gemini` |
-| `SECRET_KEY` | Application secret key | Generated |
-| `ENVIRONMENT` | Environment mode | `production` |
-| `DEBUG` | Debug mode | `false` |
+# Run Streamlit app (full version - requires API key)
+python main.py streamlit
+
+# Run demo workflow
+python main.py demo --simple
+
+# Run tests
+python main.py test
+```
+
+#### Option 2: Direct Commands
+```bash
+# Streamlit apps
+streamlit run streamlit/streamlit_app_simple.py
+streamlit run streamlit/streamlit_app.py
+
+# Demo scripts
+python demos/demo_agentic_workflow_simple.py
+python demos/demo_agentic_workflow.py
+```
+
+## 📁 Project Structure
+
+```
+├── main.py                 # Main entry point with CLI
+├── run.py                  # Simple launcher
+├── requirements.txt        # Python dependencies
+├── config.py              # Configuration settings
+├── Dockerfile             # Docker configuration
+├── docker-compose.yml     # Docker Compose setup
+├── Makefile               # Build and deployment commands
+├── .gitignore            # Git ignore rules
+├── env.example           # Environment variables template
+│
+├── src/                  # Core source code
+│   ├── __init__.py
+│   ├── customer_data_loader.py    # Data loading and preprocessing
+│   ├── visualization.py           # Chart generation
+│   ├── narrative_generator.py     # AI insights generation
+│   ├── customer_ai_agent.py       # LangChain AI agent
+│   └── ai_provider.py             # AI service providers
+│
+├── streamlit/            # Streamlit web applications
+│   ├── __init__.py
+│   ├── streamlit_app_simple.py    # Simple version (no LangChain)
+│   └── streamlit_app.py           # Full version (with LangChain)
+│
+├── demos/                # Demonstration scripts
+│   ├── __init__.py
+│   ├── demo_agentic_workflow_simple.py
+│   ├── demo_agentic_workflow.py
+│   ├── demo_multi_model_ai.py
+│   ├── demo_multi_model_simple.py
+│   ├── demo_textual_summary.py
+│   ├── demo_textual_summary_simple.py
+│   ├── customer_demo.py
+│   └── customer_demo_simple.py
+│
+├── tests/                # Test suite
+│   ├── __init__.py
+│   └── test_installation.py
+│
+├── data/                 # Data files
+│   └── customer_shopping_data.csv
+│
+├── docs/                 # Documentation
+│   ├── README.md         # This file
+│   ├── summaries/        # Project summaries
+│   │   ├── AGENTIC_WORKFLOW_SUMMARY.md
+│   │   ├── MULTI_MODEL_AI_SUMMARY.md
+│   │   ├── CUSTOMER_SHOPPING_SUMMARY.md
+│   │   ├── ASSIGNMENT_SUMMARY.md
+│   │   └── CLEANUP_SUMMARY.md
+│   ├── guides/           # User guides
+│   │   ├── SUBMISSION_GUIDE.md
+│   │   └── TROUBLESHOOTING.md
+│   ├── api/              # API documentation
+│   ├── deployment/       # Deployment guides
+│   └── user_guide/       # User documentation
+│
+├── notebooks/            # Jupyter notebooks
+│   ├── data_exploration.ipynb
+│   └── agentic_workflow.ipynb
+│
+├── app/                  # Alternative app structure
+│   ├── main.py
+│   ├── config/
+│   ├── core/
+│   ├── services/
+│   ├── utils/
+│   ├── static/
+│   ├── templates/
+│   └── tests/
+│
+├── static/               # Static assets
+├── screenshots/          # Application screenshots
+├── deployment/           # Deployment configurations
+└── scripts/              # Utility scripts
+```
+
+## 🎯 Features
+
+### Core Functionality
+- **Natural Language Query Processing**: Convert human queries to structured data operations
+- **Automated Data Visualization**: Generate charts and graphs automatically
+- **AI-Powered Insights**: Intelligent data interpretation and narrative generation
+- **Interactive Dashboard**: Web-based interface for data exploration
+
+### Data Analysis Capabilities
+- Customer spending patterns by category
+- Revenue trends over time
+- Gender and age group analysis
+- Shopping mall performance
+- Payment method preferences
+- Seasonal spending patterns
+
+### Visualization Types
+- Bar charts
+- Line charts
+- Pie charts
+- Scatter plots
+- Heatmaps
+- Time series analysis
+
+## 🤖 AI Components
+
+### Agentic AI Workflow
+- **Query Translation**: Natural language to Pandas operations
+- **Data Processing**: Automated data cleaning and transformation
+- **Visualization Generation**: Context-aware chart creation
+- **Insight Generation**: AI-powered data interpretation
 
 ### AI Models
+- **Local Mode**: Rule-based processing (no API required)
+- **OpenAI Integration**: GPT-based natural language processing
+- **Google AI**: Alternative AI provider support
+- **LangChain**: Agent framework for complex workflows
 
-The application supports multiple AI models:
+## 📊 Data
 
-- **OpenAI GPT**: Advanced language model for text generation
-- **Google Gemini**: Multimodal AI model for comprehensive analysis
-- **Local LLM**: Template-based local processing
+The application uses a comprehensive customer shopping dataset with:
+- **99,457 records** of customer transactions
+- **18 features** including demographics, products, and transactions
+- **Multiple categories** of products and shopping malls
+- **Time-series data** for trend analysis
 
-## 🧪 Testing
+## 🛠️ Development
 
+### Environment Setup
 ```bash
-# Run all tests
-make test
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Run specific test categories
-pytest app/tests/unit/ -v
-pytest app/tests/integration/ -v
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+cp env.example .env
+# Edit .env with your API keys
 ```
 
-## 📊 Usage
+### Testing
+```bash
+# Run all tests
+python main.py test
 
-1. **Data Exploration**: Navigate to the "Data Exploration" page to view dataset statistics and insights
-2. **AI Agent**: Use the "AI Agent" page to ask natural language questions about the data
-3. **Visualizations**: Explore interactive charts and AI-generated insights
-4. **Model Selection**: Choose between different AI models in the sidebar
+# Run specific test
+python tests/test_installation.py
+```
+
+### Code Quality
+```bash
+# Format code
+black src/ demos/ streamlit/ tests/
+
+# Lint code
+flake8 src/ demos/ streamlit/ tests/
+
+# Type checking
+mypy src/ demos/ streamlit/ tests/
+```
 
 ## 🚀 Deployment
 
+### Local Development
+```bash
+# Run with auto-reload
+streamlit run streamlit/streamlit_app_simple.py --server.runOnSave true
+```
+
+### Docker Deployment
+```bash
+# Build and run with Docker
+docker-compose up --build
+
+# Or build manually
+docker build -t customer-analytics .
+docker run -p 8501:8501 customer-analytics
+```
+
 ### Production Deployment
+```bash
+# Using Makefile
+make deploy
 
-1. **Set up environment**
-   ```bash
-   cp env.example .env
-   # Configure production settings
-   ```
+# Manual deployment
+gunicorn -w 4 -b 0.0.0.0:8501 streamlit_app:app
+```
 
-2. **Deploy with Docker**
-   ```bash
-   make deploy
-   ```
+## 📚 Documentation
 
-3. **Monitor application**
-   ```bash
-   docker-compose logs -f ai-analytics-app
-   ```
-
-### Cloud Deployment
-
-The application is ready for deployment on:
-- AWS ECS/Fargate
-- Google Cloud Run
-- Azure Container Instances
-- Heroku (with Docker)
-
-## 🔍 Monitoring
-
-- **Health Checks**: Built-in health check endpoint
-- **Logging**: Structured logging with configurable levels
-- **Metrics**: Application metrics and performance monitoring
+- **[Assignment Summary](docs/summaries/ASSIGNMENT_SUMMARY.md)**: Complete assignment overview
+- **[Agentic Workflow](docs/summaries/AGENTIC_WORKFLOW_SUMMARY.md)**: AI workflow implementation
+- **[Submission Guide](docs/guides/SUBMISSION_GUIDE.md)**: How to submit the assignment
+- **[Troubleshooting](docs/guides/TROUBLESHOOTING.md)**: Common issues and solutions
 
 ## 🤝 Contributing
 
@@ -186,19 +254,16 @@ The application is ready for deployment on:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is part of the Data Visualization Assignment for Summer 2025.
 
 ## 🆘 Support
 
-For support and questions:
-- Create an issue in the repository
-- Check the documentation in `docs/`
-- Review troubleshooting guide
+For issues and questions:
+1. Check the [Troubleshooting Guide](docs/guides/TROUBLESHOOTING.md)
+2. Review the [Documentation](docs/)
+3. Run the test suite: `python main.py test`
 
-## 🔄 Version History
+---
 
-- **v1.0.0**: Initial production release
-  - Multi-model AI support
-  - Agentic workflow implementation
-  - Production-grade deployment
-  - Responsive design
+**Data Visualization Assignment - Summer 2025**  
+*AI-Powered Customer Shopping Analytics Platform*

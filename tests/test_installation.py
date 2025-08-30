@@ -45,7 +45,7 @@ def test_custom_modules():
     print("\nTesting custom module imports...")
     
     # Add src to path
-    sys.path.append('src')
+    sys.path.append('../src')
     
     modules = [
         'customer_data_loader',
@@ -85,7 +85,7 @@ def test_basic_functionality():
     
     try:
         # Add src to path
-        sys.path.append('src')
+        sys.path.append('../src')
         
         # Import modules
         from customer_data_loader import load_and_prepare_customer_data

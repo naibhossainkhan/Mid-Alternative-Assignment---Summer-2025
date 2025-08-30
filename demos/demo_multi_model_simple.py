@@ -5,11 +5,14 @@ Demonstrates the multi-model AI functionality with local model
 
 import sys
 import os
-sys.path.append('src')
+sys.path.append('../src')
 
 import pandas as pd
 from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
 from narrative_generator import NarrativeGenerator
+import sys
+import os
+sys.path.append('..')
 from config import config
 
 def main():

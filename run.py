@@ -1,32 +1,17 @@
 #!/usr/bin/env python3
 """
-Main entry point for AI-Powered Customer Shopping Analytics Application.
-
-This script serves as the primary entry point for running the Streamlit application
-in a production environment.
+Simple Launcher for AI-Powered Customer Shopping Analytics
+This file provides a quick way to run the application
 """
 
-import os
 import sys
-from pathlib import Path
+import os
 
-# Add the app directory to Python path
-app_dir = Path(__file__).parent / "app"
-sys.path.insert(0, str(app_dir))
-
-def main():
-    """Main application entry point."""
-    try:
-        # Import and run the Streamlit app
-        from app.main import main as streamlit_main
-        streamlit_main()
-    except ImportError as e:
-        print(f"Error importing application modules: {e}")
-        print("Please ensure all dependencies are installed: pip install -r requirements.txt")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Application error: {e}")
-        sys.exit(1)
+# Add the project root to Python path
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, project_root)
 
 if __name__ == "__main__":
+    # Import and run the main application
+    from main import main
     main()
