@@ -60,28 +60,30 @@ class CustomerShoppingDataLoader:
         # Convert to string format for better Streamlit compatibility
         self.cleaned_data['invoice_date_str'] = self.cleaned_data['invoice_date'].dt.strftime('%Y-%m-%d')
         
-        # Add derived columns
-        self.cleaned_data['month'] = self.cleaned_data['invoice_date'].dt.month
-        self.cleaned_data['year'] = self.cleaned_data['invoice_date'].dt.year
-        self.cleaned_data['day_of_week'] = self.cleaned_data['invoice_date'].dt.day_name()
-        self.cleaned_data['quarter'] = self.cleaned_data['invoice_date'].dt.quarter
+        # Add derived columns with proper data types for Streamlit
+        self.cleaned_data['month'] = self.cleaned_data['invoice_date'].dt.month.astype('int32')
+        self.cleaned_data['year'] = self.cleaned_data['invoice_date'].dt.year.astype('int32')
+        self.cleaned_data['day_of_week'] = self.cleaned_data['invoice_date'].dt.day_name().astype('string')
+        self.cleaned_data['quarter'] = self.cleaned_data['invoice_date'].dt.quarter.astype('int32')
         
         # Calculate total amount spent
         self.cleaned_data['total_amount'] = self.cleaned_data['quantity'] * self.cleaned_data['price']
         
-        # Create age groups
-        self.cleaned_data['age_group'] = pd.cut(
+        # Create age groups with proper string types for Streamlit
+        age_groups = pd.cut(
             self.cleaned_data['age'], 
             bins=[0, 25, 35, 45, 55, 100], 
             labels=['18-25', '26-35', '36-45', '46-55', '55+']
         )
+        self.cleaned_data['age_group'] = age_groups.astype('string')
         
-        # Create spending categories
-        self.cleaned_data['spending_category'] = pd.cut(
+        # Create spending categories with proper string types for Streamlit
+        spending_categories = pd.cut(
             self.cleaned_data['total_amount'],
             bins=[0, 100, 500, 1000, 5000, float('inf')],
             labels=['Low (<$100)', 'Medium ($100-$500)', 'High ($500-$1000)', 'Very High ($1000-$5000)', 'Premium ($5000+)']
         )
+        self.cleaned_data['spending_category'] = spending_categories.astype('string')
         
         # Remove any rows with missing values
         initial_rows = len(self.cleaned_data)
@@ -91,8 +93,37 @@ class CustomerShoppingDataLoader:
         if initial_rows != final_rows:
             print(f"Removed {initial_rows - final_rows} rows with missing values")
         
+        # Optimize data types for Streamlit compatibility
+        self.cleaned_data = self._optimize_for_streamlit(self.cleaned_data)
+        
         print(f"Data cleaning completed. Final dataset has {len(self.cleaned_data):,} records")
         return self.cleaned_data
+    
+    def _optimize_for_streamlit(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Optimize dataframe data types for Streamlit Arrow compatibility
+        
+        Args:
+            df (pd.DataFrame): Input dataframe
+            
+        Returns:
+            pd.DataFrame: Optimized dataframe
+        """
+        # Convert object columns to string type
+        object_columns = df.select_dtypes(include=['object']).columns
+        for col in object_columns:
+            if col != 'invoice_date':  # Keep datetime column as is
+                df[col] = df[col].astype('string')
+        
+        # Convert numeric columns to appropriate types
+        numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
+        for col in numeric_columns:
+            if df[col].dtype == 'int64':
+                df[col] = df[col].astype('int32')
+            elif df[col].dtype == 'float64':
+                df[col] = df[col].astype('float32')
+        
+        return df
     
     def get_basic_stats(self) -> Dict[str, Any]:
         """

@@ -60,11 +60,33 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
+@st.cache_data(show_spinner="Loading customer shopping data...")
 def load_data():
-    """Load and cache the customer shopping data"""
+    """Load and cache the customer shopping data with Streamlit optimization"""
     try:
         loader, cleaned_data = load_and_prepare_customer_data("data/customer_shopping_data.csv")
+        
+        # Additional optimization for Streamlit display
+        if cleaned_data is not None:
+            # Convert datetime to string for display compatibility
+            if 'invoice_date' in cleaned_data.columns:
+                cleaned_data['invoice_date_display'] = cleaned_data['invoice_date'].dt.strftime('%Y-%m-%d')
+            
+            # Ensure all categorical columns are strings for Arrow compatibility
+            categorical_columns = ['shopping_mall', 'category', 'payment_method', 'gender', 'age_group', 'spending_category']
+            for col in categorical_columns:
+                if col in cleaned_data.columns:
+                    cleaned_data[col] = cleaned_data[col].astype('string')
+            
+            # Convert numeric columns to appropriate types
+            numeric_columns = ['quantity', 'price', 'total_amount', 'age', 'month', 'year', 'quarter']
+            for col in numeric_columns:
+                if col in cleaned_data.columns:
+                    if cleaned_data[col].dtype == 'int64':
+                        cleaned_data[col] = cleaned_data[col].astype('int32')
+                    elif cleaned_data[col].dtype == 'float64':
+                        cleaned_data[col] = cleaned_data[col].astype('float32')
+        
         return loader, cleaned_data
     except Exception as e:
         st.error(f"Error loading data: {e}")
