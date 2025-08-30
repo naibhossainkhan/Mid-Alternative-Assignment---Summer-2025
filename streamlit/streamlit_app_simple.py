@@ -88,26 +88,113 @@ st.markdown("""
     }
     
     /* Streamlit elements styling */
-    .stButton > button {
+    /* All buttons - including sidebar menu button */
+    .stButton > button,
+    button[data-testid="baseButton-secondary"],
+    button[data-testid="baseButton-primary"],
+    .stButton > button[data-testid="baseButton-secondary"],
+    .stButton > button[data-testid="baseButton-primary"] {
         background-color: #1f77b4 !important;
         color: white !important;
         border-radius: 0.5rem !important;
         border: none !important;
         padding: 0.5rem 1rem !important;
         font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
     }
     
-    .stButton > button:hover {
+    /* Button hover effects */
+    .stButton > button:hover,
+    button[data-testid="baseButton-secondary"]:hover,
+    button[data-testid="baseButton-primary"]:hover,
+    .stButton > button[data-testid="baseButton-secondary"]:hover,
+    .stButton > button[data-testid="baseButton-primary"]:hover {
         background-color: #1565c0 !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        transform: translateY(-1px) !important;
+        transition: all 0.2s ease !important;
     }
     
+    /* Sidebar menu button specifically */
+    .css-1d391kg button,
+    .css-1d391kg .stButton > button,
+    [data-testid="collapsedControl"] button,
+    [data-testid="collapsedControl"] .stButton > button {
+        background-color: #2c3e50 !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Sidebar menu button hover */
+    .css-1d391kg button:hover,
+    .css-1d391kg .stButton > button:hover,
+    [data-testid="collapsedControl"] button:hover,
+    [data-testid="collapsedControl"] .stButton > button:hover {
+        background-color: #34495e !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        transform: translateY(-1px) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    /* Secondary buttons (if any) */
+    .stButton > button[data-testid="baseButton-secondary"] {
+        background-color: #6c757d !important;
+        color: white !important;
+    }
+    
+    .stButton > button[data-testid="baseButton-secondary"]:hover {
+        background-color: #5a6268 !important;
+    }
+    
+    /* Form elements styling */
     .stSelectbox > div > div {
         border-radius: 0.5rem !important;
+        border: 2px solid #e9ecef !important;
+        background-color: white !important;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #1f77b4 !important;
+        box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.2) !important;
     }
     
     .stTextInput > div > div > input {
         border-radius: 0.5rem !important;
+        border: 2px solid #e9ecef !important;
+        background-color: white !important;
+        color: #262730 !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #1f77b4 !important;
+        box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.2) !important;
+    }
+    
+    /* Checkbox and radio buttons */
+    .stCheckbox > div > div {
+        background-color: white !important;
+        border-radius: 0.25rem !important;
+    }
+    
+    .stRadio > div > div {
+        background-color: white !important;
+        border-radius: 0.5rem !important;
+    }
+    
+    /* Slider styling */
+    .stSlider > div > div > div > div {
+        background-color: #1f77b4 !important;
+    }
+    
+    .stSlider > div > div > div > div > div {
+        background-color: #1f77b4 !important;
+        border: 2px solid white !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
     }
     
     /* Chart styling */
@@ -133,6 +220,30 @@ st.markdown("""
     .css-1d391kg {
         background-color: #f8f9fa !important;
         border-right: 1px solid #e9ecef !important;
+    }
+    
+    /* Sidebar content styling */
+    .css-1d391kg .stMarkdown,
+    .css-1d391kg .stText,
+    .css-1d391kg .stSelectbox,
+    .css-1d391kg .stSlider,
+    .css-1d391kg .stCheckbox,
+    .css-1d391kg .stRadio {
+        color: #262730 !important;
+        background-color: white !important;
+        border-radius: 0.5rem !important;
+        padding: 0.5rem !important;
+        margin: 0.25rem 0 !important;
+        border: 1px solid #e9ecef !important;
+    }
+    
+    /* Sidebar headers */
+    .css-1d391kg h1,
+    .css-1d391kg h2,
+    .css-1d391kg h3 {
+        color: #1f77b4 !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
     }
     
     /* Mobile responsive header */
