@@ -469,6 +469,323 @@ def create_customer_dashboard(data):
     
     return fig
 
+def create_interactive_charts(data):
+    """Create interactive chart selection interface"""
+    
+    st.markdown("### 📊 Interactive Chart Explorer")
+    
+    # Add filters
+    st.markdown("#### 🔍 Data Filters")
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+    
+    with filter_col1:
+        selected_categories = st.multiselect(
+            "Filter by Category:",
+            options=data['category'].unique(),
+            default=data['category'].unique()[:5]
+        )
+    
+    with filter_col2:
+        selected_malls = st.multiselect(
+            "Filter by Shopping Mall:",
+            options=data['shopping_mall'].unique(),
+            default=data['shopping_mall'].unique()[:3]
+        )
+    
+    with filter_col3:
+        date_range = st.date_input(
+            "Date Range:",
+            value=(data['invoice_date'].min(), data['invoice_date'].max()),
+            min_value=data['invoice_date'].min(),
+            max_value=data['invoice_date'].max()
+        )
+    
+    # Filter data based on selections
+    filtered_data = data[
+        (data['category'].isin(selected_categories)) &
+        (data['shopping_mall'].isin(selected_malls)) &
+        (data['invoice_date'] >= pd.to_datetime(date_range[0])) &
+        (data['invoice_date'] <= pd.to_datetime(date_range[1]))
+    ]
+    
+    st.info(f"📊 Showing {len(filtered_data):,} records from {len(selected_categories)} categories and {len(selected_malls)} malls")
+    
+    # Chart type selection
+    chart_types = {
+        "Bar Chart": "bar",
+        "Line Chart": "line", 
+        "Scatter Plot": "scatter",
+        "Pie Chart": "pie",
+        "Heatmap": "heatmap",
+        "Box Plot": "box",
+        "Histogram": "histogram",
+        "Violin Plot": "violin",
+        "3D Scatter": "3d_scatter",
+        "Sunburst": "sunburst"
+    }
+    
+    # Data column selection
+    numeric_columns = filtered_data.select_dtypes(include=[np.number]).columns.tolist()
+    categorical_columns = filtered_data.select_dtypes(include=['object', 'string']).columns.tolist()
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        chart_type = st.selectbox("Select Chart Type:", list(chart_types.keys()))
+    
+    with col2:
+        x_column = st.selectbox("X-Axis:", categorical_columns + ['invoice_date'])
+    
+    with col3:
+        y_column = st.selectbox("Y-Axis:", numeric_columns)
+    
+    # AI Chart Recommendation
+    if st.button("🤖 Get AI Chart Recommendation"):
+        recommendation = get_ai_chart_recommendation(filtered_data, x_column, y_column)
+        st.info(f"**AI Recommendation:** {recommendation}")
+    
+    # Create the selected chart
+    if x_column and y_column:
+        fig = create_chart(filtered_data, chart_types[chart_type], x_column, y_column)
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Chart insights
+        insights = generate_chart_insights(filtered_data, chart_type, x_column, y_column)
+        st.markdown("### 📈 Chart Insights")
+        st.markdown(f'<div class="ai-insight">{insights}</div>', unsafe_allow_html=True)
+
+def create_chart(data, chart_type, x_col, y_col):
+    """Create different types of interactive charts"""
+    
+    if chart_type == "bar":
+        fig = px.bar(data.groupby(x_col)[y_col].sum().reset_index(), 
+                    x=x_col, y=y_col, title=f"{y_col} by {x_col}")
+    
+    elif chart_type == "line":
+        if x_col == 'invoice_date':
+            daily_data = data.groupby('invoice_date')[y_col].sum().reset_index()
+            fig = px.line(daily_data, x='invoice_date', y=y_col, 
+                         title=f"{y_col} Trend Over Time")
+        else:
+            fig = px.line(data.groupby(x_col)[y_col].sum().reset_index(), 
+                         x=x_col, y=y_col, title=f"{y_col} by {x_col}")
+    
+    elif chart_type == "scatter":
+        fig = px.scatter(data, x=x_col, y=y_col, 
+                        title=f"{y_col} vs {x_col}",
+                        hover_data=['category', 'shopping_mall'])
+    
+    elif chart_type == "pie":
+        pie_data = data.groupby(x_col)[y_col].sum().reset_index()
+        fig = px.pie(pie_data, values=y_col, names=x_col, 
+                    title=f"{y_col} Distribution by {x_col}")
+    
+    elif chart_type == "heatmap":
+        # Create correlation heatmap for numeric columns
+        numeric_data = data.select_dtypes(include=[np.number])
+        corr_matrix = numeric_data.corr()
+        fig = px.imshow(corr_matrix, 
+                       title="Correlation Heatmap",
+                       color_continuous_scale='RdBu')
+    
+    elif chart_type == "box":
+        fig = px.box(data, x=x_col, y=y_col, 
+                    title=f"{y_col} Distribution by {x_col}")
+    
+    elif chart_type == "histogram":
+        fig = px.histogram(data, x=y_col, 
+                          title=f"Distribution of {y_col}",
+                          nbins=30)
+    
+    elif chart_type == "violin":
+        fig = px.violin(data, x=x_col, y=y_col, 
+                       title=f"{y_col} Distribution by {x_col}")
+    
+    elif chart_type == "3d_scatter":
+        # Add a third dimension (category)
+        fig = px.scatter_3d(data, x=x_col, y=y_col, z='category',
+                           title=f"3D Scatter: {y_col} vs {x_col} vs Category",
+                           hover_data=['shopping_mall', 'payment_method'])
+    
+    elif chart_type == "sunburst":
+        # Create hierarchical sunburst chart
+        sunburst_data = data.groupby(['category', 'shopping_mall'])[y_col].sum().reset_index()
+        fig = px.sunburst(sunburst_data, path=['category', 'shopping_mall'], values=y_col,
+                         title=f"Hierarchical View: {y_col} by Category and Mall")
+    
+    else:
+        # Default to bar chart
+        fig = px.bar(data.groupby(x_col)[y_col].sum().reset_index(), 
+                    x=x_col, y=y_col, title=f"{y_col} by {x_col}")
+    
+    # Add interactivity
+    fig.update_layout(
+        hovermode='closest',
+        showlegend=True,
+        height=500
+    )
+    
+    return fig
+
+def get_ai_chart_recommendation(data, x_col, y_col):
+    """AI-powered chart recommendation based on data characteristics"""
+    
+    # Analyze data characteristics
+    x_unique = data[x_col].nunique()
+    y_range = data[y_col].max() - data[y_col].min()
+    data_size = len(data)
+    
+    # Simple rule-based recommendations
+    if x_col == 'invoice_date':
+        return "📈 **Line Chart** - Perfect for showing trends over time!"
+    
+    elif x_unique <= 10:
+        if y_range > 1000:
+            return "📊 **Bar Chart** - Great for comparing categories with large value differences!"
+        else:
+            return "🥧 **Pie Chart** - Ideal for showing proportions among few categories!"
+    
+    elif x_unique > 10 and x_unique <= 50:
+        return "📊 **Bar Chart** - Good for comparing multiple categories!"
+    
+    elif x_unique > 50:
+        return "📈 **Line Chart** - Best for many data points to show patterns!"
+    
+    elif data_size > 1000:
+        return "🔍 **Scatter Plot** - Great for large datasets to show relationships!"
+    
+    else:
+        return "📊 **Bar Chart** - Safe choice for general comparison!"
+
+def generate_chart_insights(data, chart_type, x_col, y_col):
+    """Generate insights about the chart data"""
+    
+    # Calculate basic statistics
+    grouped_data = data.groupby(x_col)[y_col].sum().reset_index()
+    total = grouped_data[y_col].sum()
+    max_val = grouped_data[y_col].max()
+    min_val = grouped_data[y_col].min()
+    avg_val = grouped_data[y_col].mean()
+    
+    insights = f"""
+    **Chart Analysis: {chart_type.upper()}**
+    
+    **Key Statistics:**
+    - Total {y_col}: {total:,.0f}
+    - Highest {y_col}: {max_val:,.0f}
+    - Lowest {y_col}: {min_val:,.0f}
+    - Average {y_col}: {avg_val:,.0f}
+    
+    **Data Distribution:**
+    - Number of {x_col} categories: {len(grouped_data)}
+    - Data points: {len(data):,}
+    
+    **Recommendations:**
+    - Consider focusing on top performing {x_col} categories
+    - Look for patterns in {y_col} distribution
+    - Analyze seasonal trends if time-based data
+    """
+    
+    return insights
+
+def create_advanced_analytics(data):
+    """Create advanced analytics dashboard"""
+    
+    st.markdown("### 🔬 Advanced Analytics")
+    
+    # Time series analysis
+    st.markdown("#### 📈 Time Series Analysis")
+    time_col1, time_col2 = st.columns(2)
+    
+    with time_col1:
+        time_metric = st.selectbox("Select Metric:", ['total_amount', 'quantity', 'price'])
+    
+    with time_col2:
+        time_group = st.selectbox("Group by:", ['day', 'week', 'month'])
+    
+    if st.button("Generate Time Series"):
+        time_series_fig = create_time_series(data, time_metric, time_group)
+        st.plotly_chart(time_series_fig, use_container_width=True)
+    
+    # Customer segmentation
+    st.markdown("#### 👥 Customer Segmentation")
+    seg_col1, seg_col2 = st.columns(2)
+    
+    with seg_col1:
+        seg_method = st.selectbox("Segmentation Method:", ['RFM', 'Spending', 'Frequency'])
+    
+    with seg_col2:
+        seg_metric = st.selectbox("Segment by:", ['total_amount', 'quantity', 'customer_id'])
+    
+    if st.button("Generate Segmentation"):
+        seg_fig = create_customer_segmentation(data, seg_method, seg_metric)
+        st.plotly_chart(seg_fig, use_container_width=True)
+
+def create_time_series(data, metric, group_by):
+    """Create time series analysis"""
+    
+    data_copy = data.copy()
+    data_copy['invoice_date'] = pd.to_datetime(data_copy['invoice_date'])
+    
+    if group_by == 'day':
+        data_copy['time_group'] = data_copy['invoice_date'].dt.date
+    elif group_by == 'week':
+        data_copy['time_group'] = data_copy['invoice_date'].dt.to_period('W')
+    else:  # month
+        data_copy['time_group'] = data_copy['invoice_date'].dt.to_period('M')
+    
+    time_series = data_copy.groupby('time_group')[metric].sum().reset_index()
+    time_series['time_group'] = time_series['time_group'].astype(str)
+    
+    fig = px.line(time_series, x='time_group', y=metric,
+                  title=f"{metric} Trend by {group_by}",
+                  markers=True)
+    
+    fig.update_layout(height=400)
+    return fig
+
+def create_customer_segmentation(data, method, metric):
+    """Create customer segmentation analysis"""
+    
+    if method == 'RFM':
+        # RFM Analysis
+        customer_data = data.groupby('customer_id').agg({
+            'invoice_date': 'max',
+            'total_amount': 'sum',
+            'customer_id': 'count'
+        }).reset_index()
+        
+        customer_data.columns = ['customer_id', 'last_purchase', 'monetary', 'frequency']
+        
+        # Create segments
+        customer_data['segment'] = pd.cut(customer_data['monetary'], 
+                                        bins=3, labels=['Low', 'Medium', 'High'])
+        
+        fig = px.scatter(customer_data, x='frequency', y='monetary', 
+                        color='segment', title="RFM Customer Segmentation",
+                        hover_data=['customer_id'])
+    
+    elif method == 'Spending':
+        # Spending-based segmentation
+        spending_data = data.groupby('customer_id')[metric].sum().reset_index()
+        spending_data['segment'] = pd.qcut(spending_data[metric], 
+                                          q=4, labels=['Bronze', 'Silver', 'Gold', 'Platinum'])
+        
+        fig = px.bar(spending_data.groupby('segment')[metric].mean().reset_index(),
+                    x='segment', y=metric, title="Average Spending by Segment")
+    
+    else:  # Frequency
+        # Frequency-based segmentation
+        freq_data = data.groupby('customer_id').size().reset_index(name='frequency')
+        freq_data['segment'] = pd.qcut(freq_data['frequency'], 
+                                      q=3, labels=['Occasional', 'Regular', 'Frequent'])
+        
+        fig = px.pie(freq_data.groupby('segment').size().reset_index(name='count'),
+                    values='count', names='segment', title="Customer Frequency Distribution")
+    
+    fig.update_layout(height=400)
+    return fig
+
 def main():
     """Main application function"""
     
@@ -580,8 +897,9 @@ def main():
     # Page navigation buttons
     pages = [
         {"icon": "📊", "name": "Dashboard", "desc": "Analytics Overview"},
+        {"icon": "📈", "name": "Interactive Charts", "desc": "AI-Powered Chart Explorer"},
+        {"icon": "🔬", "name": "Advanced Analytics", "desc": "Time Series & Segmentation"},
         {"icon": "🤖", "name": "AI Agent", "desc": "Natural Language Queries"},
-        {"icon": "📈", "name": "Advanced Analysis", "desc": "Deep Analytics"},
         {"icon": "🔍", "name": "Data Explorer", "desc": "Raw Data & Insights"}
     ]
     
@@ -630,6 +948,18 @@ def main():
                     st.markdown(f'<div class="ai-insight">{insights}</div>', unsafe_allow_html=True)
                 except Exception as e:
                     st.error(f"Error generating insights: {e}")
+    
+    elif page == "📈 Interactive Charts":
+        st.markdown('<h2 class="sub-header">AI-Powered Interactive Chart Explorer</h2>', unsafe_allow_html=True)
+        
+        # Interactive chart explorer
+        create_interactive_charts(data)
+    
+    elif page == "🔬 Advanced Analytics":
+        st.markdown('<h2 class="sub-header">Advanced Analytics & Customer Segmentation</h2>', unsafe_allow_html=True)
+        
+        # Advanced analytics
+        create_advanced_analytics(data)
     
     elif page == "🤖 AI Agent":
         st.markdown('<h2 class="sub-header">Agentic AI Workflow</h2>', unsafe_allow_html=True)
@@ -816,7 +1146,7 @@ def main():
             st.warning("AI components not available. Please check your API configuration.")
     
     elif page == "📈 Advanced Analysis":
-        st.markdown('<h2 class="sub-header">Advanced Query Analysis</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 class="sub-header">Advanced Query Analysis (Legacy)</h2>', unsafe_allow_html=True)
         
         if narrative_gen:
             # Time series analysis
