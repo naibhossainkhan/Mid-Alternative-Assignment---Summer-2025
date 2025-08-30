@@ -1,5 +1,5 @@
-# Minimal requirements for Streamlit Cloud deployment
-# This file contains only the essential dependencies needed for the app to run
+# Minimal requirements for Simple Streamlit App (no LangChain)
+# This file contains only the essential dependencies for the simple version
 
 # Core Streamlit
 streamlit>=1.28.0
@@ -13,15 +13,10 @@ plotly>=5.0.0
 matplotlib>=3.5.0
 seaborn>=0.11.0
 
-# AI/ML
+# AI/ML (minimal)
 openai>=1.0.0
 google-generativeai>=0.3.0
 # tiktoken>=0.5.0  # Removed due to compilation issues on Streamlit Cloud
-
-# LangChain and AI Agents
-langchain==0.0.350
-langchain-openai==0.0.2
-langchain-community==0.0.10
 
 # Configuration
 python-dotenv>=1.0.0

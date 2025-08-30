@@ -36,7 +36,7 @@ openai==1.6.1
 google-generativeai==0.3.2
 langchain==0.1.0
 langchain-openai==0.0.5
-tiktoken==0.5.2
+# tiktoken==0.5.2  # Removed due to compilation issues
 
 # Environment and Configuration
 python-dotenv==1.0.0
@@ -65,7 +65,7 @@ matplotlib==3.8.2
 seaborn==0.13.0
 openai==1.6.1
 google-generativeai==0.3.2
-tiktoken==0.5.2
+# tiktoken==0.5.2  # Removed due to compilation issues
 python-dotenv==1.0.0
 markdown-it-py==4.0.0
 mdurl==0.1.2
