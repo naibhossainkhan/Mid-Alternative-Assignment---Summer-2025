@@ -376,66 +376,66 @@ def main():
                                     result = agent.process_query(query)
                                     
                                     if result.get("success", False):
-                                st.success("✅ Analysis completed successfully!")
-                                
-                                # Display results
-                                col1, col2 = st.columns([1, 1])
-                                
-                                with col1:
-                                    st.markdown("### 📊 Agent Response")
-                                    st.write(result["agent_response"])
-                                
-                                with col2:
-                                    st.markdown("### ⏱️ Performance")
-                                    st.metric("Execution Time", f"{result['execution_time']:.2f}s")
-                                
-                                # AI insights
-                                st.markdown("### 🤖 AI-Generated Insights")
-                                st.markdown(f'<div class="ai-insight">{result["insights"]}</div>', unsafe_allow_html=True)
-                                
-                                # Generate visualization
-                                st.markdown("### 📈 Generated Visualization")
-                                try:
-                                    viz_result = agent.generate_visualization_pipeline(query)
-                                
-                                if viz_result["chart_type"] == "line":
-                                    fig = visualizer.create_line_chart(
-                                        viz_result["data"], 
-                                        viz_result["data"].columns[0], 
-                                        viz_result["data"].columns[1], 
-                                        viz_result["title"],
-                                        "plotly"
-                                    )
-                                elif viz_result["chart_type"] == "bar":
-                                    fig = visualizer.create_bar_chart(
-                                        viz_result["data"], 
-                                        viz_result["data"].columns[0], 
-                                        viz_result["data"].columns[1], 
-                                        viz_result["title"],
-                                        "plotly"
-                                    )
-                                elif viz_result["chart_type"] == "pie":
-                                    fig = visualizer.create_pie_chart(
-                                        viz_result["data"], 
-                                        viz_result["data"].columns[1], 
-                                        viz_result["data"].columns[0], 
-                                        viz_result["title"],
-                                        "plotly"
-                                    )
-                                else:
-                                    fig = visualizer.create_bar_chart(
-                                        viz_result["data"], 
-                                        viz_result["data"].columns[0], 
-                                        viz_result["data"].columns[1], 
-                                        viz_result["title"],
-                                        "plotly"
-                                    )
-                                
-                                st.plotly_chart(fig, use_container_width=True)
-                                
-                                except Exception as viz_error:
-                                    st.error(f"Error generating visualization: {viz_error}")
-                                    st.info("The analysis was successful, but visualization generation failed.")
+                                        st.success("✅ Analysis completed successfully!")
+                                        
+                                        # Display results
+                                        col1, col2 = st.columns([1, 1])
+                                        
+                                        with col1:
+                                            st.markdown("### 📊 Agent Response")
+                                            st.write(result["agent_response"])
+                                        
+                                        with col2:
+                                            st.markdown("### ⏱️ Performance")
+                                            st.metric("Execution Time", f"{result['execution_time']:.2f}s")
+                                        
+                                        # AI insights
+                                        st.markdown("### 🤖 AI-Generated Insights")
+                                        st.markdown(f'<div class="ai-insight">{result["insights"]}</div>', unsafe_allow_html=True)
+                                        
+                                        # Generate visualization
+                                        st.markdown("### 📈 Generated Visualization")
+                                        try:
+                                            viz_result = agent.generate_visualization_pipeline(query)
+                                            
+                                                        if viz_result["chart_type"] == "line":
+                                                fig = visualizer.create_line_chart(
+                                                    viz_result["data"], 
+                                                    viz_result["data"].columns[0], 
+                                                    viz_result["data"].columns[1], 
+                                                    viz_result["title"],
+                                                    "plotly"
+                                                )
+                                            elif viz_result["chart_type"] == "bar":
+                                                fig = visualizer.create_bar_chart(
+                                                    viz_result["data"], 
+                                                    viz_result["data"].columns[0], 
+                                                    viz_result["data"].columns[1], 
+                                                    viz_result["title"],
+                                                    "plotly"
+                                                )
+                                            elif viz_result["chart_type"] == "pie":
+                                                fig = visualizer.create_pie_chart(
+                                                    viz_result["data"], 
+                                                    viz_result["data"].columns[1], 
+                                                    viz_result["data"].columns[0], 
+                                                    viz_result["title"],
+                                                    "plotly"
+                                                )
+                                            else:
+                                                fig = visualizer.create_bar_chart(
+                                                    viz_result["data"], 
+                                                    viz_result["data"].columns[0], 
+                                                    viz_result["data"].columns[1], 
+                                                    viz_result["title"],
+                                                    "plotly"
+                                                )
+                                            
+                                            st.plotly_chart(fig, use_container_width=True)
+                                            
+                                        except Exception as viz_error:
+                                            st.error(f"Error generating visualization: {viz_error}")
+                                            st.info("The analysis was successful, but visualization generation failed.")
                                     
                             except Exception as agent_error:
                                 st.error(f"❌ Analysis failed: {agent_error}")
