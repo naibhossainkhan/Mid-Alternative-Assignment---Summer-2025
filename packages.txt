@@ -1,17 +1,9 @@
-# System dependencies for Streamlit Cloud
-# Required for pandas, numpy, and other data processing libraries
-
-# Core system libraries
 libgcc-ng
 libstdcxx-ng
 libgomp
-
-# Development tools (if needed)
 gcc
 gcc-c++
 make
-
-# Additional libraries for data processing
 libblas
 liblapack
 libopenblas
