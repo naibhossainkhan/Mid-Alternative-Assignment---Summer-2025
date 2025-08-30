@@ -314,13 +314,99 @@ def main():
     # Initialize AI components
     narrative_gen = initialize_ai_components()
     
-    # Sidebar
-    st.sidebar.title("📊 Analytics Options")
+    # Initialize session state for model and page selection
+    if 'selected_model' not in st.session_state:
+        st.session_state.selected_model = 'gpt'  # Default to GPT
+    if 'selected_page' not in st.session_state:
+        st.session_state.selected_page = "📊 Dashboard"
     
-    # Main content
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 Dashboard", "🤖 AI Agent", "🔍 Query Analysis", "📋 Data Explorer"])
+    # Modern Sidebar Design
+    st.sidebar.markdown("""
+    <div style="text-align: center; padding: 1rem 0;">
+        <h2 style="color: #1f77b4; margin: 0; font-size: 1.5rem;">🎯 Navigation</h2>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with tab1:
+    # AI Model Selection Section
+    st.sidebar.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+        <h3 style="color: white; margin: 0 0 1rem 0; font-size: 1.1rem;">🤖 AI Model</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Model selection buttons
+    model_options = {
+        'local': {'icon': '🧠', 'name': 'Local LLM', 'desc': 'No API Key Required'},
+        'gemini': {'icon': '🔮', 'name': 'Gemini 2.5 Pro', 'desc': 'Your API Key Configured'},
+        'gpt': {'icon': '⚡', 'name': 'GPT-5', 'desc': 'Your API Key Configured'}
+    }
+    
+    # Create model selection buttons
+    for model_key, model_info in model_options.items():
+        is_selected = st.session_state.selected_model == model_key
+        
+        if st.sidebar.button(
+            f"{model_info['icon']} {model_info['name']}",
+            key=f"model_{model_key}",
+            help=model_info['desc']
+        ):
+            st.session_state.selected_model = model_key
+            st.rerun()
+        
+        # Show selected status
+        if is_selected:
+            st.sidebar.markdown(f"""
+            <div style="background: #e8f5e8; padding: 0.5rem; border-radius: 5px; 
+                        border-left: 4px solid #4caf50; margin: 0.5rem 0;">
+                <small style="color: #2e7d32;">✅ {model_info['name']} - Active</small>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    st.sidebar.markdown("---")
+    
+    # Page Navigation Section
+    st.sidebar.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+        <h3 style="color: white; margin: 0 0 1rem 0; font-size: 1.1rem;">📱 Pages</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Page navigation buttons
+    pages = [
+        {"icon": "📊", "name": "Dashboard", "desc": "Analytics Overview"},
+        {"icon": "🤖", "name": "AI Agent", "desc": "Natural Language Queries"},
+        {"icon": "📈", "name": "Advanced Analysis", "desc": "Deep Analytics"},
+        {"icon": "🔍", "name": "Data Explorer", "desc": "Raw Data & Insights"}
+    ]
+    
+    for page_info in pages:
+        page_key = f"{page_info['icon']} {page_info['name']}"
+        is_selected = st.session_state.selected_page == page_key
+        
+        if st.sidebar.button(
+            f"{page_info['icon']} {page_info['name']}",
+            key=f"page_{page_info['name'].lower().replace(' ', '_')}",
+            help=page_info['desc']
+        ):
+            st.session_state.selected_page = page_key
+            st.rerun()
+        
+        # Show selected status
+        if is_selected:
+            st.sidebar.markdown(f"""
+            <div style="background: #e3f2fd; padding: 0.5rem; border-radius: 5px; 
+                        border-left: 4px solid #2196f3; margin: 0.5rem 0;">
+                <small style="color: #1565c0;">📍 {page_info['name']} - Current Page</small>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Get current page
+    page = st.session_state.selected_page
+    
+    # Main content based on selected page
+    if page == "📊 Dashboard":
         st.markdown('<h2 class="sub-header">Customer Shopping Analytics Dashboard</h2>', unsafe_allow_html=True)
         
         # Display metrics
@@ -341,7 +427,7 @@ def main():
                 except Exception as e:
                     st.error(f"Error generating insights: {e}")
     
-    with tab2:
+    elif page == "🤖 AI Agent":
         st.markdown('<h2 class="sub-header">Agentic AI Workflow</h2>', unsafe_allow_html=True)
         
         if narrative_gen:
@@ -436,14 +522,13 @@ def main():
                                         except Exception as viz_error:
                                             st.error(f"Error generating visualization: {viz_error}")
                                             st.info("The analysis was successful, but visualization generation failed.")
-                                    
-                            except Exception as agent_error:
-                                st.error(f"❌ Analysis failed: {agent_error}")
-                                st.info("Please try a different query or check your API configuration.")
-                                
-                            else:
-                                st.error("❌ Analysis failed. Please try a different query.")
-                                st.write(result.get("agent_response", "No response available"))
+                                    else:
+                                        st.error("❌ Analysis failed. Please try a different query.")
+                                        st.write(result.get("agent_response", "No response available"))
+                                        
+                                except Exception as agent_error:
+                                    st.error(f"❌ Analysis failed: {agent_error}")
+                                    st.info("Please try a different query or check your API configuration.")
                     else:
                         st.warning("Please enter a query to analyze.")
                 
@@ -470,7 +555,7 @@ def main():
         else:
             st.warning("AI components not available. Please check your API configuration.")
     
-    with tab3:
+    elif page == "📈 Advanced Analysis":
         st.markdown('<h2 class="sub-header">Advanced Query Analysis</h2>', unsafe_allow_html=True)
         
         if narrative_gen:
@@ -530,7 +615,7 @@ def main():
         else:
             st.warning("AI components not available for advanced analysis.")
     
-    with tab4:
+    elif page == "🔍 Data Explorer":
         st.markdown('<h2 class="sub-header">Data Explorer</h2>', unsafe_allow_html=True)
         
         # Data overview
