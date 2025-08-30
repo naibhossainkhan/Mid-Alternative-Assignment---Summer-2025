@@ -1,9 +1,8 @@
-libgcc-ng
-libstdcxx-ng
-libgomp
 gcc
-gcc-c++
+g++
 make
-libblas
-liblapack
-libopenblas
+libblas3
+liblapack3
+libopenblas0
+libgomp1
+libstdc++6
