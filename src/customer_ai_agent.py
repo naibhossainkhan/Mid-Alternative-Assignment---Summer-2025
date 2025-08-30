@@ -13,7 +13,7 @@ from langchain.prompts import StringPromptTemplate
 from langchain.schema import AgentAction, AgentFinish
 from langchain_openai import ChatOpenAI
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -22,6 +22,8 @@ load_dotenv()
 class QueryInput(BaseModel):
     """Input schema for natural language queries"""
     query: str = Field(description="Natural language query about customer shopping data")
+    
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 class CustomerDataAnalysisTool(BaseTool):
     """Tool for performing customer shopping data analysis operations"""
