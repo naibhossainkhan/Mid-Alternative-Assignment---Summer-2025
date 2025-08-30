@@ -73,19 +73,25 @@ def load_data():
                 cleaned_data['invoice_date_display'] = cleaned_data['invoice_date'].dt.strftime('%Y-%m-%d')
             
             # Ensure all categorical columns are strings for Arrow compatibility
-            categorical_columns = ['shopping_mall', 'category', 'payment_method', 'gender', 'age_group', 'spending_category']
+            categorical_columns = ['shopping_mall', 'category', 'payment_method', 'gender', 'age_group', 'spending_category', 'day_of_week']
             for col in categorical_columns:
                 if col in cleaned_data.columns:
                     cleaned_data[col] = cleaned_data[col].astype('string')
             
             # Convert numeric columns to appropriate types
-            numeric_columns = ['quantity', 'price', 'total_amount', 'age', 'month', 'year', 'quarter']
+            numeric_columns = ['quantity', 'price', 'total_amount', 'age', 'month', 'year', 'quarter', 'customer_id']
             for col in numeric_columns:
                 if col in cleaned_data.columns:
                     if cleaned_data[col].dtype == 'int64':
                         cleaned_data[col] = cleaned_data[col].astype('int32')
                     elif cleaned_data[col].dtype == 'float64':
                         cleaned_data[col] = cleaned_data[col].astype('float32')
+            
+            # Handle any remaining object columns
+            object_columns = cleaned_data.select_dtypes(include=['object']).columns
+            for col in object_columns:
+                if col != 'invoice_date' and col != 'invoice_date_display':
+                    cleaned_data[col] = cleaned_data[col].astype('string')
         
         return loader, cleaned_data
     except Exception as e:
