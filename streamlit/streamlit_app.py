@@ -516,7 +516,7 @@ def main():
     # Model selection buttons
     model_options = {
         'local': {'icon': '🧠', 'name': 'Local LLM', 'desc': 'No API Key Required'},
-        'gemini': {'icon': '🔮', 'name': 'Gemini 2.5 Pro', 'desc': 'Your API Key Configured'},
+        'gemini': {'icon': '🔮', 'name': 'Gemini 1.5 Flash', 'desc': 'Free Tier - Your API Key Configured'},
         'gpt': {'icon': '⚡', 'name': 'GPT-5', 'desc': 'Your API Key Configured'}
     }
     
@@ -622,12 +622,12 @@ def main():
                     # Check for Gemini API key
                     if not os.getenv('GOOGLE_API_KEY'):
                         st.warning("⚠️ Google API key not found for Gemini. Please set GOOGLE_API_KEY environment variable.")
-                        st.info("Get free API key from: https://makersuite.google.com/app/apikey")
+                        st.info("Get free API key from: https://makersuite.google.com/app/apikey (Gemini 1.5 Flash - Free Tier)")
                         agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
                     else:
                         try:
                             agent = CustomerShoppingAgent(data, visualizer, narrative_gen, model_type='gemini')
-                            st.success("🔮 Gemini 1.5 Pro connected successfully!")
+                            st.success("🔮 Gemini 1.5 Flash connected successfully!")
                         except Exception as langchain_error:
                             st.warning(f"⚠️ Gemini agent failed to initialize: {langchain_error}")
                             st.info("Falling back to simplified AI workflow...")
