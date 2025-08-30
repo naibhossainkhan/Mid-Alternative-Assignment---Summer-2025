@@ -1,0 +1,51 @@
+name: Deploy AI Analytics App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        DEFAULT_AI_MODEL: ${{ secrets.DEFAULT_AI_MODEL }}
+      run: |
+        python -m pytest tests/
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to production
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        DEFAULT_AI_MODEL: ${{ secrets.DEFAULT_AI_MODEL }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        ENVIRONMENT: production
+      run: |
+        echo "Deploying with secure environment variables..."
+        # Your deployment commands here

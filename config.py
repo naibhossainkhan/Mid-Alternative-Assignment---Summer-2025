@@ -13,11 +13,48 @@ class AIConfig:
     """Configuration class for AI model settings"""
     
     def __init__(self):
-        # API Keys
-        self.openai_api_key = os.getenv('OPENAI_API_KEY', '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')
-        # self.gemini_api_key = os.getenv('GEMINI_API_KEY', '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')
-        self.gemini_api_key = os.getenv('GEMINI_API_KEY', 'AIzaSyCSgthqUPp1X--3dAu7bihS_00izLY8PlY')
+        # API Keys - Load from multiple sources (env vars, Streamlit secrets, etc.)
+        self.openai_api_key = self._get_secret('OPENAI_API_KEY')
+        self.gemini_api_key = self._get_secret('GEMINI_API_KEY')
         
+        # Validate that required API keys are present
+        if not self.openai_api_key:
+            print("Warning: OPENAI_API_KEY not found in environment variables or Streamlit secrets")
+        if not self.gemini_api_key:
+            print("Warning: GEMINI_API_KEY not found in environment variables or Streamlit secrets")
+        
+        # Setup model configurations
+        self._setup_models()
+    
+    def _get_secret(self, key: str) -> str:
+        """
+        Get secret from multiple sources in order of priority:
+        1. Environment variables
+        2. Streamlit secrets (if running in Streamlit Cloud)
+        3. .env file (already handled by python-dotenv)
+        """
+        # First try environment variables
+        value = os.getenv(key)
+        if value:
+            return value
+        
+        # Then try Streamlit secrets (for Streamlit Cloud deployment)
+        try:
+            import streamlit as st
+            if hasattr(st, 'secrets') and hasattr(st.secrets, 'ai_config'):
+                # Try to get from Streamlit secrets
+                if key == 'OPENAI_API_KEY':
+                    return st.secrets.ai_config.get('openai_api_key', '')
+                elif key == 'GEMINI_API_KEY':
+                    return st.secrets.ai_config.get('gemini_api_key', '')
+        except ImportError:
+            # Not running in Streamlit environment
+            pass
+        
+        return ''
+    
+    def _setup_models(self):
+        """Setup model configurations after API keys are loaded"""
         # Default model settings
         self.default_model = os.getenv('DEFAULT_AI_MODEL', 'gemini')  # 'gpt', 'gemini', 'local'
         
@@ -29,7 +66,7 @@ class AIConfig:
                 'api_key': self.openai_api_key,
                 'max_tokens': 500,
                 'temperature': 0.7,
-                'enabled': bool(self.openai_api_key)
+                'enabled': bool(self.openai_api_key and self.openai_api_key.strip())
             },
             'gemini': {
                 'name': 'Gemini 2.5 Pro',
@@ -37,7 +74,7 @@ class AIConfig:
                 'api_key': self.gemini_api_key,
                 'max_tokens': 500,
                 'temperature': 0.7,
-                'enabled': bool(self.gemini_api_key)
+                'enabled': bool(self.gemini_api_key and self.gemini_api_key.strip())
             },
             'local': {
                 'name': 'Local LLM',

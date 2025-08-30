@@ -185,6 +185,9 @@ logs/
 .env.production
 .env.staging
 
+# Streamlit secrets
+.streamlit/secrets.toml
+
 # Data files (if not needed in repo)
 *.csv
 *.xlsx
