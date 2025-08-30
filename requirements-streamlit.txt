@@ -1,0 +1,28 @@
+# Minimal requirements for Streamlit Cloud deployment
+# This file contains only the essential dependencies needed for the app to run
+
+# Core Streamlit
+streamlit>=1.28.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.21.0
+
+# Visualization
+plotly>=5.0.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# AI/ML
+openai>=1.0.0
+google-generativeai>=0.3.0
+tiktoken>=0.5.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Streamlit Cloud compatibility
+markdown-it-py>=3.0.0
+mdurl>=0.1.0
+pygments>=2.15.0
+rich>=13.0.0
