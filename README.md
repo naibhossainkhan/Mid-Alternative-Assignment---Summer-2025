@@ -24,9 +24,6 @@ pip install -r requirements.txt
 ```bash
 # Run the main Streamlit application
 streamlit run streamlit_app.py
-
-# Run the simple version (no AI dependencies)
-streamlit run streamlit_app_simple.py
 ```
 
 #### Option 2: Demo Scripts
@@ -89,7 +86,6 @@ python run.py test
 │       └── helpers.py          # Helper functions
 │
 ├── streamlit_app.py            # Main Streamlit application
-├── streamlit_app_simple.py     # Simple Streamlit app
 │
 ├── demos/                      # Demonstration scripts
 │   ├── __init__.py

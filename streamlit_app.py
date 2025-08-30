@@ -16,22 +16,35 @@ import time
 
 # Import our custom modules from the new core structure
 try:
-    from core.data import CustomerShoppingDataLoader, load_and_prepare_customer_data
-    from core.ai import NarrativeGenerator, CustomerShoppingAgent
-    from core.visualization import DataVisualizer
-except ImportError:
-    # Fallback to old structure for compatibility
+    # Add current directory to path for Streamlit Cloud
     import sys
     import os
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    src_path = os.path.join(current_dir, 'src')
-    if src_path not in sys.path:
-        sys.path.insert(0, src_path)
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
     
-    from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
-    from narrative_generator import NarrativeGenerator
-    from visualization import DataVisualizer
-    from customer_ai_agent import CustomerShoppingAgent
+    from core.data import CustomerShoppingDataLoader, load_and_prepare_customer_data
+    from core.ai import NarrativeGenerator, CustomerShoppingAgent
+    from core.visualization import DataVisualizer
+except ImportError as e:
+    st.error(f"Failed to import from core structure: {e}")
+    # Fallback to old structure for compatibility
+    try:
+        import sys
+        import os
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        src_path = os.path.join(current_dir, 'src')
+        if src_path not in sys.path:
+            sys.path.insert(0, src_path)
+        
+        from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
+        from narrative_generator import NarrativeGenerator
+        from visualization import DataVisualizer
+        from customer_ai_agent import CustomerShoppingAgent
+    except ImportError as e2:
+        st.error(f"Failed to import from src structure: {e2}")
+        st.error("Please ensure all required modules are available")
+        st.stop()
 
 # Page configuration
 st.set_page_config(
@@ -143,11 +156,29 @@ def load_data():
         
         st.success(f"Loading data from: {data_path}")
         try:
+            # Add debug information for Streamlit Cloud
+            st.info(f"Attempting to load data from: {data_path}")
+            st.info(f"File exists: {os.path.exists(data_path)}")
+            st.info(f"File size: {os.path.getsize(data_path) if os.path.exists(data_path) else 'N/A'} bytes")
+            
             loader, cleaned_data = load_and_prepare_customer_data(data_path)
+            
+            if loader is None or cleaned_data is None:
+                st.error("Data loading returned None values")
+                return None, None
+                
         except Exception as e:
             st.error(f"Error in load_and_prepare_customer_data: {e}")
             st.exception(e)
-            return None, None
+            # Try alternative loading method
+            try:
+                st.info("Trying alternative data loading method...")
+                cleaned_data = pd.read_csv(data_path)
+                st.success(f"Successfully loaded {len(cleaned_data)} rows using pandas")
+                return None, cleaned_data
+            except Exception as e2:
+                st.error(f"Alternative loading also failed: {e2}")
+                return None, None
         
         # Additional optimization for Streamlit display with Arrow compatibility
         if cleaned_data is not None:

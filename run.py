@@ -23,7 +23,8 @@ def run_streamlit():
 def run_streamlit_simple():
     """Run the simple Streamlit application."""
     print("🚀 Starting simple Streamlit application...")
-    subprocess.run(["streamlit", "run", "streamlit_app_simple.py"])
+    print("⚠️  Simple version removed. Using main app instead.")
+    subprocess.run(["streamlit", "run", "streamlit_app.py"])
 
 def run_demo():
     """Run the AI workflow demo."""
