@@ -175,9 +175,9 @@ class CustomerDataAnalysisTool(BaseTool):
 class CustomerVisualizationTool(BaseTool):
     """Tool for creating customer shopping visualizations"""
     
-    name = "customer_visualization"
-    description = "Create charts and visualizations based on customer shopping data analysis results"
-    args_schema = QueryInput
+    name: str = "customer_visualization"
+    description: str = "Create charts and visualizations based on customer shopping data analysis results"
+    args_schema: type = QueryInput
     
     def __init__(self, visualizer):
         super().__init__()
