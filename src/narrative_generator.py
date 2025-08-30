@@ -33,6 +33,16 @@ class NarrativeGenerator:
         try:
             if self.model_name == 'local':
                 self.ai_provider = None
+            elif self.model_name == 'gemini':
+                # Use Gemini directly for better compatibility
+                import google.generativeai as genai
+                api_key = os.getenv('GOOGLE_API_KEY')
+                if api_key:
+                    genai.configure(api_key=api_key)
+                    self.ai_provider = genai
+                else:
+                    self.model_name = 'local'
+                    self.ai_provider = None
             else:
                 self.ai_provider = AIProvider(self.model_name)
         except Exception as e:
@@ -205,6 +215,11 @@ class NarrativeGenerator:
                 
                 Note: Using local analysis mode. The core data analysis functionality is fully operational.
                 """
+            elif hasattr(self.ai_provider, 'generate_content'):
+                # Use Gemini directly
+                model = self.ai_provider.GenerativeModel('gemini-1.5-pro')
+                response = model.generate_content(prompt)
+                return response.text
             else:
                 system_prompt = "You are an expert business intelligence analyst with deep understanding of customer shopping data and business metrics."
                 return self.ai_provider.generate_text(prompt, system_prompt)

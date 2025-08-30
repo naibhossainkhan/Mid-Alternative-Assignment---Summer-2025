@@ -613,9 +613,40 @@ def main():
             try:
                 visualizer = DataVisualizer()
                 
-                # Use Local LLM by default - skip API checks for now
-                st.info("🧠 Using Local LLM - No API key required")
-                agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                # Create agent based on selected model
+                if st.session_state.selected_model == 'local':
+                    # Use simple agentic workflow for local processing (no API needed)
+                    st.info("🧠 Using Local LLM - No API key required")
+                    agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                elif st.session_state.selected_model == 'gemini':
+                    # Check for Gemini API key
+                    if not os.getenv('GOOGLE_API_KEY'):
+                        st.warning("⚠️ Google API key not found for Gemini. Please set GOOGLE_API_KEY environment variable.")
+                        st.info("Get free API key from: https://makersuite.google.com/app/apikey")
+                        agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                    else:
+                        try:
+                            agent = CustomerShoppingAgent(data, visualizer, narrative_gen, model_type='gemini')
+                            st.success("🔮 Gemini 1.5 Pro connected successfully!")
+                        except Exception as langchain_error:
+                            st.warning(f"⚠️ Gemini agent failed to initialize: {langchain_error}")
+                            st.info("Falling back to simplified AI workflow...")
+                            agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                elif st.session_state.selected_model == 'gpt':
+                    # Check for OpenAI API key
+                    if not os.getenv('OPENAI_API_KEY'):
+                        st.warning("⚠️ OpenAI API key not found. Falling back to local processing.")
+                        agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                    else:
+                        try:
+                            agent = CustomerShoppingAgent(data, visualizer, narrative_gen, model_type='openai')
+                        except Exception as langchain_error:
+                            st.warning(f"⚠️ OpenAI agent failed to initialize: {langchain_error}")
+                            st.info("Falling back to simplified AI workflow...")
+                            agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
+                else:
+                    # Default to local processing
+                    agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
                 
                 st.markdown("### Natural Language Query Interface")
                 st.markdown("Ask questions about your data in natural language:")
