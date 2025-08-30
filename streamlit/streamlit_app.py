@@ -398,7 +398,7 @@ def main():
                                         try:
                                             viz_result = agent.generate_visualization_pipeline(query)
                                             
-                                                        if viz_result["chart_type"] == "line":
+                                            if viz_result["chart_type"] == "line":
                                                 fig = visualizer.create_line_chart(
                                                     viz_result["data"], 
                                                     viz_result["data"].columns[0], 
