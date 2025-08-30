@@ -61,7 +61,7 @@ class AIConfig:
         # Model configurations
         self.models = {
             'gpt': {
-                'name': 'GPT-5',
+                'name': 'GPT-3.5 Turbo',
                 'provider': 'openai',
                 'api_key': self.openai_api_key,
                 'max_tokens': 500,

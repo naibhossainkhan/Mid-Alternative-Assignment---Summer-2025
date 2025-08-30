@@ -245,7 +245,8 @@ class CustomerShoppingAgent:
             self.llm = ChatOpenAI(
                 temperature=0,
                 model="gpt-3.5-turbo",
-                openai_api_key=os.getenv('OPENAI_API_KEY')
+                openai_api_key=os.getenv('OPENAI_API_KEY'),
+                base_url="https://openrouter.ai/api/v1"
             )
         elif model_type == 'gemini':
             from langchain_google_genai import ChatGoogleGenerativeAI

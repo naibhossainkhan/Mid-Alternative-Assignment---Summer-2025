@@ -14,9 +14,8 @@ class AIConfig:
     
     def __init__(self):
         # API Keys
-        self.openai_api_key = os.getenv('OPENAI_API_KEY', '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')
-        # self.gemini_api_key = os.getenv('GEMINI_API_KEY', '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')
-        self.gemini_api_key = os.getenv('GEMINI_API_KEY', 'AIzaSyCSgthqUPp1X--3dAu7bihS_00izLY8PlY')
+        self.openai_api_key = os.getenv('OPENAI_API_KEY')
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
         
         # Default model settings
         self.default_model = os.getenv('DEFAULT_AI_MODEL', 'gemini')  # 'gpt', 'gemini', 'local'
@@ -24,7 +23,7 @@ class AIConfig:
         # Model configurations
         self.models = {
             'gpt': {
-                'name': 'GPT-5',
+                'name': 'GPT-3.5 Turbo',
                 'provider': 'openai',
                 'api_key': self.openai_api_key,
                 'max_tokens': 500,
