@@ -12,10 +12,10 @@ sys.path.append('../src')
 
 import pandas as pd
 import time
-from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
-from customer_ai_agent import CustomerShoppingAgent
-from visualization import DataVisualizer
-from narrative_generator import NarrativeGenerator
+from core.data import CustomerShoppingDataLoader, load_and_prepare_customer_data
+from core.ai import CustomerShoppingAgent
+from core.visualization import DataVisualizer
+from core.ai import NarrativeGenerator
 import sys
 import os
 sys.path.append('..')

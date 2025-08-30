@@ -15,69 +15,86 @@ git clone <repository-url>
 cd "Mid Alternative Assignment - Summer 2025"
 
 # Install dependencies
-python main.py install
-# or
 pip install -r requirements.txt
 ```
 
 ### Running the Application
 
-#### Option 1: Using the Main Launcher (Recommended)
+#### Option 1: Streamlit Web App (Recommended)
 ```bash
-# Run Streamlit app (simple version)
-python main.py streamlit --simple
+# Run the main Streamlit application
+streamlit run streamlit_app.py
 
-# Run Streamlit app (full version - requires API key)
-python main.py streamlit
-
-# Run demo workflow
-python main.py demo --simple
-
-# Run tests
-python main.py test
+# Run the simple version (no AI dependencies)
+streamlit run streamlit_app_simple.py
 ```
 
-#### Option 2: Direct Commands
+#### Option 2: Demo Scripts
 ```bash
-# Streamlit apps
-streamlit run streamlit/streamlit_app_simple.py
-streamlit run streamlit/streamlit_app.py
-
-# Demo scripts
-python demos/demo_agentic_workflow_simple.py
+# Run AI workflow demo
 python demos/demo_agentic_workflow.py
+
+# Run simple demo
+python demos/demo_agentic_workflow_simple.py
+
+# Run multi-model AI demo
+python demos/demo_multi_model_ai.py
+```
+
+#### Option 3: Using the Launcher
+```bash
+# Run Streamlit app
+python run.py streamlit
+
+# Run demo
+python run.py demo
+
+# Run tests
+python run.py test
 ```
 
 ## 📁 Project Structure
 
 ```
-├── main.py                 # Main entry point with CLI
-├── run.py                  # Simple launcher
-├── requirements.txt        # Python dependencies
-├── config.py              # Configuration settings
-├── Dockerfile             # Docker configuration
-├── docker-compose.yml     # Docker Compose setup
-├── Makefile               # Build and deployment commands
-├── .gitignore            # Git ignore rules
-├── env.example           # Environment variables template
+├── README.md                    # Project documentation
+├── requirements.txt             # Main dependencies
+├── requirements-simple.txt      # Minimal dependencies
+├── run.py                       # Application launcher
+├── config.py                    # Configuration settings
+├── .env                         # Environment variables
+├── .streamlit/                  # Streamlit configuration
+│   ├── config.toml             # Streamlit settings
+│   └── secrets.toml            # API keys (not in git)
+├── .gitignore                  # Git ignore rules
+├── env.example                 # Environment template
 │
-├── src/                  # Core source code
+├── core/                       # Core application modules
 │   ├── __init__.py
-│   ├── customer_data_loader.py    # Data loading and preprocessing
-│   ├── visualization.py           # Chart generation
-│   ├── narrative_generator.py     # AI insights generation
-│   ├── customer_ai_agent.py       # LangChain AI agent
-│   └── ai_provider.py             # AI service providers
+│   ├── data/                   # Data handling
+│   │   ├── __init__.py
+│   │   ├── loader.py           # Data loading and preprocessing
+│   │   └── processor.py        # Data processing utilities
+│   ├── ai/                     # AI and ML components
+│   │   ├── __init__.py
+│   │   ├── agent.py            # LangChain AI agent
+│   │   ├── generator.py        # AI narrative generation
+│   │   └── provider.py         # AI service providers
+│   ├── visualization/          # Visualization components
+│   │   ├── __init__.py
+│   │   ├── charts.py           # Chart generation
+│   │   └── dashboard.py        # Dashboard components
+│   └── utils/                  # Utility functions
+│       ├── __init__.py
+│       ├── config.py           # Configuration utilities
+│       └── helpers.py          # Helper functions
 │
-├── streamlit/            # Streamlit web applications
-│   ├── __init__.py
-│   ├── streamlit_app_simple.py    # Simple version (no LangChain)
-│   └── streamlit_app.py           # Full version (with LangChain)
+├── streamlit_app.py            # Main Streamlit application
+├── streamlit_app_simple.py     # Simple Streamlit app
 │
-├── demos/                # Demonstration scripts
+├── demos/                      # Demonstration scripts
 │   ├── __init__.py
-│   ├── demo_agentic_workflow_simple.py
 │   ├── demo_agentic_workflow.py
+│   ├── demo_agentic_workflow_simple.py
 │   ├── demo_multi_model_ai.py
 │   ├── demo_multi_model_simple.py
 │   ├── demo_textual_summary.py
@@ -85,46 +102,41 @@ python demos/demo_agentic_workflow.py
 │   ├── customer_demo.py
 │   └── customer_demo_simple.py
 │
-├── tests/                # Test suite
+├── tests/                      # Test suite
 │   ├── __init__.py
-│   └── test_installation.py
+│   ├── test_core/              # Core module tests
+│   │   ├── test_data.py
+│   │   ├── test_ai.py
+│   │   └── test_visualization.py
+│   ├── test_integration/       # Integration tests
+│   └── test_streamlit/         # Streamlit app tests
 │
-├── data/                 # Data files
+├── data/                       # Data files
 │   └── customer_shopping_data.csv
 │
-├── docs/                 # Documentation
-│   ├── README.md         # This file
-│   ├── summaries/        # Project summaries
-│   │   ├── AGENTIC_WORKFLOW_SUMMARY.md
-│   │   ├── MULTI_MODEL_AI_SUMMARY.md
-│   │   ├── CUSTOMER_SHOPPING_SUMMARY.md
-│   │   ├── ASSIGNMENT_SUMMARY.md
-│   │   └── CLEANUP_SUMMARY.md
-│   ├── guides/           # User guides
-│   │   ├── SUBMISSION_GUIDE.md
-│   │   └── TROUBLESHOOTING.md
-│   ├── api/              # API documentation
-│   ├── deployment/       # Deployment guides
-│   └── user_guide/       # User documentation
+├── docs/                       # Documentation
+│   ├── api/                    # API documentation
+│   ├── deployment/             # Deployment guides
+│   ├── guides/                 # User guides
+│   ├── summaries/              # Project summaries
+│   └── user_guide/             # User documentation
 │
-├── notebooks/            # Jupyter notebooks
+├── notebooks/                  # Jupyter notebooks
 │   ├── data_exploration.ipynb
 │   └── agentic_workflow.ipynb
 │
-├── app/                  # Alternative app structure
-│   ├── main.py
-│   ├── config/
-│   ├── core/
-│   ├── services/
-│   ├── utils/
-│   ├── static/
-│   ├── templates/
-│   └── tests/
+├── static/                     # Static assets
+│   ├── css/
+│   ├── js/
+│   └── images/
 │
-├── static/               # Static assets
-├── screenshots/          # Application screenshots
-├── deployment/           # Deployment configurations
-└── scripts/              # Utility scripts
+├── deployment/                 # Deployment configurations
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── scripts/
+│
+├── screenshots/                # Application screenshots
+└── scripts/                    # Utility scripts
 ```
 
 ## 🎯 Features
@@ -192,22 +204,23 @@ cp env.example .env
 ### Testing
 ```bash
 # Run all tests
-python main.py test
+python -m pytest tests/
 
-# Run specific test
-python tests/test_installation.py
+# Run specific test category
+python -m pytest tests/test_core/
+python -m pytest tests/test_integration/
 ```
 
 ### Code Quality
 ```bash
 # Format code
-black src/ demos/ streamlit/ tests/
+black core/ demos/ tests/
 
 # Lint code
-flake8 src/ demos/ streamlit/ tests/
+flake8 core/ demos/ tests/
 
 # Type checking
-mypy src/ demos/ streamlit/ tests/
+mypy core/ demos/ tests/
 ```
 
 ## 🚀 Deployment
@@ -215,7 +228,7 @@ mypy src/ demos/ streamlit/ tests/
 ### Local Development
 ```bash
 # Run with auto-reload
-streamlit run streamlit/streamlit_app_simple.py --server.runOnSave true
+streamlit run streamlit_app.py --server.runOnSave true
 ```
 
 ### Docker Deployment
@@ -230,8 +243,8 @@ docker run -p 8501:8501 customer-analytics
 
 ### Production Deployment
 ```bash
-# Using Makefile
-make deploy
+# Using deployment scripts
+./deployment/scripts/deploy.sh
 
 # Manual deployment
 gunicorn -w 4 -b 0.0.0.0:8501 streamlit_app:app
@@ -261,7 +274,7 @@ This project is part of the Data Visualization Assignment for Summer 2025.
 For issues and questions:
 1. Check the [Troubleshooting Guide](docs/guides/TROUBLESHOOTING.md)
 2. Review the [Documentation](docs/)
-3. Run the test suite: `python main.py test`
+3. Run the test suite: `python -m pytest tests/`
 
 ---
 

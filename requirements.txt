@@ -1,37 +1,30 @@
-# LangChain Requirements for Streamlit Cloud Deployment
-# This file uses specific versions that have better wheel support
-
-# Core Streamlit
+# Core dependencies
 streamlit>=1.28.0
-
-# Data processing
 pandas>=2.0.0
-numpy>=1.21.0
+numpy>=1.24.0
+plotly>=5.15.0
 
-# Visualization
-plotly>=5.0.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-
-# AI/ML (specific versions for better compatibility)
-openai>=1.99.9
-google-generativeai>=0.8.5
-langchain-google-genai>=2.0.10
-
-# LangChain and AI Agents (specific versions with better wheel support)
+# AI and ML dependencies
 langchain>=0.1.0
 langchain-openai>=0.3.0
 langchain-community>=0.0.10
+openai>=1.99.9
+google-generativeai>=0.3.0
 
-# Configuration
+# Data processing
 python-dotenv>=1.0.0
+pydantic>=2.0.0
 
-# Streamlit Cloud compatibility
-markdown-it-py>=3.0.0
-mdurl>=0.1.0
-pygments>=2.15.0
-rich>=13.0.0
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
 
-# Additional dependencies for stability
-requests>=2.26.0
-urllib3>=1.21.1
+# Development and testing
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Optional: Jupyter notebooks
+jupyter>=1.0.0
+ipykernel>=6.25.0

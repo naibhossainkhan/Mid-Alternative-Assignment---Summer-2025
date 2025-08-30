@@ -8,17 +8,23 @@ Demonstrates the core Agentic AI pipeline without requiring full LangChain:
 
 import sys
 import os
-sys.path.append('../src')
-
+import sys
 import pandas as pd
 import time
-from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
-from visualization import DataVisualizer
-from narrative_generator import NarrativeGenerator
-import sys
-import os
-sys.path.append('..')
-from config import config
+
+# Try new core structure first, fallback to old structure
+try:
+    from core.data import CustomerShoppingDataLoader, load_and_prepare_customer_data
+    from core.visualization import DataVisualizer
+    from core.ai import NarrativeGenerator
+    from core.utils.config import config
+except ImportError:
+    # Fallback to old structure
+    sys.path.append('src')
+    from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
+    from visualization import DataVisualizer
+    from narrative_generator import NarrativeGenerator
+    from config import config
 
 class SimpleAgenticWorkflow:
     """Simplified agentic workflow that demonstrates the core functionality"""

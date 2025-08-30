@@ -16,10 +16,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Import our custom modules
-from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
-from narrative_generator import NarrativeGenerator
-from visualization import DataVisualizer
-from customer_ai_agent import CustomerShoppingAgent
+from core.data import CustomerShoppingDataLoader, load_and_prepare_customer_data
+from core.ai import NarrativeGenerator
+from core.visualization import DataVisualizer
+from core.ai import CustomerShoppingAgent
 
 # Set up plotting style
 plt.style.use('seaborn-v0_8')
