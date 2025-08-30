@@ -16,12 +16,27 @@ import time
 
 # Add src to path
 sys.path.append('src')
+sys.path.append('../src')  # Also try parent directory
 
 # Import our custom modules
-from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
-from narrative_generator import NarrativeGenerator
-from visualization import DataVisualizer
-from customer_ai_agent import CustomerShoppingAgent
+try:
+    from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
+    from narrative_generator import NarrativeGenerator
+    from visualization import DataVisualizer
+    from customer_ai_agent import CustomerShoppingAgent
+except ImportError:
+    # Try alternative import paths
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    src_path = os.path.join(current_dir, '..', 'src')
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    
+    from customer_data_loader import CustomerShoppingDataLoader, load_and_prepare_customer_data
+    from narrative_generator import NarrativeGenerator
+    from visualization import DataVisualizer
+    from customer_ai_agent import CustomerShoppingAgent
 
 # Page configuration
 st.set_page_config(
@@ -194,6 +209,169 @@ def initialize_ai_components():
         st.warning(f"AI components not available: {e}")
         return None
 
+class SimpleAgenticWorkflow:
+    """Simplified agentic workflow for Streamlit app"""
+    
+    def __init__(self, data: pd.DataFrame, visualizer, narrative_generator):
+        self.data = data
+        self.visualizer = visualizer
+        self.narrative_generator = narrative_generator
+    
+    def translate_query_to_pandas(self, query: str) -> str:
+        """Translate natural language query to Pandas code"""
+        query_lower = query.lower()
+        
+        # Sales and revenue analysis
+        if "revenue" in query_lower or "sales" in query_lower:
+            if "trend" in query_lower and "category" in query_lower:
+                return "df.groupby(['invoice_date', 'category'])['total_amount'].sum().reset_index()"
+            elif "category" in query_lower:
+                return "df.groupby('category')['total_amount'].sum().reset_index()"
+            elif "mall" in query_lower or "shopping" in query_lower:
+                return "df.groupby('shopping_mall')['total_amount'].sum().reset_index()"
+            elif "gender" in query_lower:
+                return "df.groupby('gender')['total_amount'].sum().reset_index()"
+            elif "age" in query_lower:
+                return "df.groupby('age_group')['total_amount'].sum().reset_index()"
+            elif "trend" in query_lower:
+                return "df.groupby('invoice_date')['total_amount'].sum().reset_index()"
+            else:
+                return "df.groupby('category')['total_amount'].sum().reset_index()"
+        
+        # Category analysis
+        elif "category" in query_lower:
+            if "popular" in query_lower or "most" in query_lower:
+                return "df.groupby('category').size().reset_index(name='count').sort_values('count', ascending=False)"
+            else:
+                return "df.groupby('category')['total_amount'].sum().reset_index()"
+        
+        # Shopping mall analysis
+        elif "mall" in query_lower or "shopping" in query_lower:
+            if "popular" in query_lower or "most" in query_lower:
+                return "df.groupby('shopping_mall').size().reset_index(name='count').sort_values('count', ascending=False)"
+            else:
+                return "df.groupby('shopping_mall')['total_amount'].sum().reset_index()"
+        
+        # Gender analysis
+        elif "gender" in query_lower:
+            if "spending" in query_lower:
+                return "df.groupby('gender')['total_amount'].sum().reset_index()"
+            else:
+                return "df.groupby('gender').size().reset_index(name='count')"
+        
+        # Age analysis
+        elif "age" in query_lower:
+            if "spending" in query_lower:
+                return "df.groupby('age_group')['total_amount'].sum().reset_index()"
+            else:
+                return "df.groupby('age_group').size().reset_index(name='count')"
+        
+        # Payment method analysis
+        elif "payment" in query_lower:
+            return "df.groupby('payment_method')['total_amount'].sum().reset_index()"
+        
+        # Summary statistics
+        elif "summary" in query_lower or "overview" in query_lower:
+            return "summary_stats = {'total_revenue': df['total_amount'].sum(), 'total_transactions': len(df), 'total_customers': df['customer_id'].nunique()}"
+        
+        # Default to revenue analysis
+        else:
+            return "df.groupby('category')['total_amount'].sum().reset_index()"
+    
+    def execute_query(self, query: str) -> dict:
+        """Execute a natural language query and return results"""
+        start_time = time.time()
+        
+        try:
+            # Step 1: Translate query to Pandas code
+            pandas_code = self.translate_query_to_pandas(query)
+            
+            # Step 2: Execute the Pandas code
+            local_vars = {'df': self.data, 'pd': pd}
+            exec(f"result = {pandas_code}", globals(), local_vars)
+            result = local_vars.get('result', None)
+            
+            # Step 3: Generate insights
+            insights = self.narrative_generator.generate_query_analysis(
+                query, 
+                self.data if result is None else (result if isinstance(result, pd.DataFrame) else pd.DataFrame()),
+                time.time() - start_time
+            )
+            
+            # Step 4: Generate visualization
+            viz_result = self.generate_visualization(query, result)
+            
+            return {
+                "query": query,
+                "pandas_code": pandas_code,
+                "result": result,
+                "insights": insights,
+                "visualization": viz_result,
+                "execution_time": time.time() - start_time,
+                "success": True
+            }
+            
+        except Exception as e:
+            return {
+                "query": query,
+                "pandas_code": "Error in translation",
+                "result": None,
+                "insights": f"Error processing query: {str(e)}",
+                "visualization": None,
+                "execution_time": time.time() - start_time,
+                "success": False
+            }
+    
+    def generate_visualization(self, query: str, data) -> dict:
+        """Generate visualization based on query and data"""
+        try:
+            if data is None or (isinstance(data, pd.DataFrame) and data.empty):
+                return {"chart_type": "none", "title": "No data available", "data": None}
+            
+            query_lower = query.lower()
+            
+            # Determine chart type based on query
+            if "trend" in query_lower or "time" in query_lower:
+                chart_type = "line"
+            elif "compare" in query_lower or "distribution" in query_lower:
+                chart_type = "bar"
+            elif "proportion" in query_lower or "percentage" in query_lower:
+                chart_type = "pie"
+            else:
+                chart_type = "bar"
+            
+            # Generate title
+            if "revenue" in query_lower:
+                title = "Revenue Analysis"
+            elif "category" in query_lower:
+                title = "Category Analysis"
+            elif "mall" in query_lower:
+                title = "Shopping Mall Analysis"
+            elif "gender" in query_lower:
+                title = "Gender Analysis"
+            elif "age" in query_lower:
+                title = "Age Group Analysis"
+            else:
+                title = "Data Analysis"
+            
+            return {
+                "chart_type": chart_type,
+                "title": title,
+                "data": data
+            }
+            
+        except Exception as e:
+            return {"chart_type": "none", "title": f"Error: {str(e)}", "data": None}
+    
+    def process_query(self, query: str) -> dict:
+        """Process a natural language query (compatibility method)"""
+        return self.execute_query(query)
+    
+    def generate_visualization_pipeline(self, query: str) -> dict:
+        """Generate visualization pipeline (compatibility method)"""
+        result = self.execute_query(query)
+        return result.get("visualization", {"chart_type": "none", "title": "No visualization", "data": None})
+
 def display_metrics(data):
     """Display key metrics"""
     col1, col2, col3, col4 = st.columns(4)
@@ -316,7 +494,7 @@ def main():
     
     # Initialize session state for model and page selection
     if 'selected_model' not in st.session_state:
-        st.session_state.selected_model = 'gpt'  # Default to GPT
+        st.session_state.selected_model = 'local'  # Default to Local LLM
     if 'selected_page' not in st.session_state:
         st.session_state.selected_page = "📊 Dashboard"
     
@@ -431,24 +609,25 @@ def main():
         st.markdown('<h2 class="sub-header">Agentic AI Workflow</h2>', unsafe_allow_html=True)
         
         if narrative_gen:
-            # Initialize AI agent
+            # Initialize AI agent based on selected model
             try:
                 visualizer = DataVisualizer()
                 
-                # Check if OpenAI API key is available
-                if not os.getenv('OPENAI_API_KEY'):
-                    st.warning("⚠️ OpenAI API key not found. AI Agent features will be limited.")
-                    st.info("To enable full AI features, set your OPENAI_API_KEY environment variable.")
-                    agent = None
-                else:
-                    agent = CustomerShoppingAgent(data, visualizer, narrative_gen)
+                # Use Local LLM by default - skip API checks for now
+                st.info("🧠 Using Local LLM - No API key required")
+                agent = SimpleAgenticWorkflow(data, visualizer, narrative_gen)
                 
                 st.markdown("### Natural Language Query Interface")
                 st.markdown("Ask questions about your data in natural language:")
                 
+                # Initialize query in session state if not exists
+                if 'query' not in st.session_state:
+                    st.session_state.query = ""
+                
                 # Query input
                 query = st.text_input(
                     "Enter your query:",
+                    value=st.session_state.query,
                     placeholder="e.g., Show me revenue trends by category"
                 )
                 
@@ -469,62 +648,69 @@ def main():
                                         
                                         with col1:
                                             st.markdown("### 📊 Agent Response")
-                                            st.write(result["agent_response"])
+                                            agent_response = result.get("agent_response", "No response available")
+                                            st.write(agent_response)
                                         
                                         with col2:
                                             st.markdown("### ⏱️ Performance")
-                                            st.metric("Execution Time", f"{result['execution_time']:.2f}s")
+                                            execution_time = result.get("execution_time", 0)
+                                            st.metric("Execution Time", f"{execution_time:.2f}s")
                                         
                                         # AI insights
                                         st.markdown("### 🤖 AI-Generated Insights")
-                                        st.markdown(f'<div class="ai-insight">{result["insights"]}</div>', unsafe_allow_html=True)
+                                        insights = result.get("insights", "No insights available")
+                                        st.markdown(f'<div class="ai-insight">{insights}</div>', unsafe_allow_html=True)
                                         
-                                        # Generate visualization
+                                        # Generate visualization (optional)
                                         st.markdown("### 📈 Generated Visualization")
                                         try:
-                                            viz_result = agent.generate_visualization_pipeline(query)
-                                            
-                                            if viz_result["chart_type"] == "line":
-                                                fig = visualizer.create_line_chart(
-                                                    viz_result["data"], 
-                                                    viz_result["data"].columns[0], 
-                                                    viz_result["data"].columns[1], 
-                                                    viz_result["title"],
-                                                    "plotly"
-                                                )
-                                            elif viz_result["chart_type"] == "bar":
-                                                fig = visualizer.create_bar_chart(
-                                                    viz_result["data"], 
-                                                    viz_result["data"].columns[0], 
-                                                    viz_result["data"].columns[1], 
-                                                    viz_result["title"],
-                                                    "plotly"
-                                                )
-                                            elif viz_result["chart_type"] == "pie":
-                                                fig = visualizer.create_pie_chart(
-                                                    viz_result["data"], 
-                                                    viz_result["data"].columns[1], 
-                                                    viz_result["data"].columns[0], 
-                                                    viz_result["title"],
-                                                    "plotly"
-                                                )
+                                            if hasattr(agent, 'generate_visualization_pipeline'):
+                                                viz_result = agent.generate_visualization_pipeline(query)
+                                                
+                                                if viz_result.get("chart_type") == "line":
+                                                    fig = visualizer.create_line_chart(
+                                                        viz_result["data"], 
+                                                        viz_result["data"].columns[0], 
+                                                        viz_result["data"].columns[1], 
+                                                        viz_result["title"],
+                                                        "plotly"
+                                                    )
+                                                elif viz_result.get("chart_type") == "bar":
+                                                    fig = visualizer.create_bar_chart(
+                                                        viz_result["data"], 
+                                                        viz_result["data"].columns[0], 
+                                                        viz_result["data"].columns[1], 
+                                                        viz_result["title"],
+                                                        "plotly"
+                                                    )
+                                                elif viz_result.get("chart_type") == "pie":
+                                                    fig = visualizer.create_pie_chart(
+                                                        viz_result["data"], 
+                                                        viz_result["data"].columns[1], 
+                                                        viz_result["data"].columns[0], 
+                                                        viz_result["title"],
+                                                        "plotly"
+                                                    )
+                                                else:
+                                                    fig = visualizer.create_bar_chart(
+                                                        viz_result["data"], 
+                                                        viz_result["data"].columns[0], 
+                                                        viz_result["data"].columns[1], 
+                                                        viz_result["title"],
+                                                        "plotly"
+                                                    )
+                                                
+                                                st.plotly_chart(fig, use_container_width=True)
                                             else:
-                                                fig = visualizer.create_bar_chart(
-                                                    viz_result["data"], 
-                                                    viz_result["data"].columns[0], 
-                                                    viz_result["data"].columns[1], 
-                                                    viz_result["title"],
-                                                    "plotly"
-                                                )
-                                            
-                                            st.plotly_chart(fig, use_container_width=True)
+                                                st.info("Visualization pipeline not available for this agent type.")
                                             
                                         except Exception as viz_error:
                                             st.error(f"Error generating visualization: {viz_error}")
                                             st.info("The analysis was successful, but visualization generation failed.")
                                     else:
                                         st.error("❌ Analysis failed. Please try a different query.")
-                                        st.write(result.get("agent_response", "No response available"))
+                                        agent_response = result.get("agent_response", "No response available")
+                                        st.write(f"Error details: {agent_response}")
                                         
                                 except Exception as agent_error:
                                     st.error(f"❌ Analysis failed: {agent_error}")
@@ -542,10 +728,27 @@ def main():
                     "What are the customer spending patterns by age group?"
                 ]
                 
-                for i, example in enumerate(example_queries):
-                    if st.button(f"Query {i+1}: {example}", key=f"query_{i}"):
-                        st.session_state.query = example
-                        st.rerun()
+                # Example queries in columns for better layout
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    for i in range(0, len(example_queries), 2):
+                        if i < len(example_queries):
+                            if st.button(f"Query {i+1}: {example_queries[i]}", key=f"query_{i}"):
+                                st.session_state.query = example_queries[i]
+                                st.rerun()
+                
+                with col2:
+                    for i in range(1, len(example_queries), 2):
+                        if i < len(example_queries):
+                            if st.button(f"Query {i+1}: {example_queries[i]}", key=f"query_{i}"):
+                                st.session_state.query = example_queries[i]
+                                st.rerun()
+                
+                # Clear query button
+                if st.button("🗑️ Clear Query", key="clear_query"):
+                    st.session_state.query = ""
+                    st.rerun()
                 
             except Exception as e:
                 st.error(f"Error initializing AI agent: {e}")

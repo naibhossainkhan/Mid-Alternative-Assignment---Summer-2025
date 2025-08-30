@@ -2,7 +2,7 @@
 
 ## ✅ **LangChain + Streamlit Cloud - SOLVED**
 
-This guide ensures your LangChain app deploys successfully on Streamlit Cloud without tiktoken compilation issues.
+This guide ensures your LangChain app deploys successfully on Streamlit Cloud without tiktoken compilation issues and output parser validation errors.
 
 ## 🎯 **Solution: Use Newer LangChain Versions**
 
@@ -11,6 +11,7 @@ This guide ensures your LangChain app deploys successfully on Streamlit Cloud wi
 - **Reduced compilation** requirements
 - **Better Streamlit Cloud** compatibility
 - **Full LangChain functionality** maintained
+- **Fixed output parser validation** - Uses modern LangChain patterns
 
 ## 📋 **Step-by-Step Deployment**
 
@@ -98,6 +99,12 @@ google-generativeai>=0.3.0
 3. **Verify requirements** - Ensure correct file is being used
 4. **Try redeploying** - Sometimes a fresh deployment helps
 
+### **If Getting Output Parser Validation Errors:**
+1. **Check LangChain version** - Ensure using 0.1.0+ for modern output parser support
+2. **Verify agent code** - Ensure using class-based output parsers
+3. **Test locally** - Verify agent initialization works on your machine
+4. **Check imports** - Ensure all LangChain imports are correct
+
 ### **If App Doesn't Load:**
 1. **Check secrets** - Verify API keys are set correctly
 2. **Test locally** - Ensure app works on your machine
@@ -159,6 +166,7 @@ DEFAULT_AI_MODEL=gemini
 - ✅ `docs/TIKTOKEN_FIX_GUIDE.md` - Detailed fix guide
 - ✅ `docs/UI_COLOR_FIX.md` - UI improvements
 - ✅ `docs/ARROW_SERIALIZATION_FIX.md` - Performance fixes
+- ✅ `docs/LANGCHAIN_OUTPUT_PARSER_FIX.md` - Output parser validation fix
 - ✅ `docs/STREAMLIT_CLOUD_DEPLOYMENT.md` - General deployment guide
 
 ## 🎯 **Success Checklist**

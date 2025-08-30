@@ -7,8 +7,8 @@ import os
 import json
 from typing import Dict, Any, List, Optional
 import pandas as pd
-from ai_provider import AIProvider
-from config import config
+from .ai_provider import AIProvider
+from ..config import config
 
 class NarrativeGenerator:
     """Class to generate narrative insights using Multi-Model Generative AI"""

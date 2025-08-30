@@ -9,7 +9,7 @@ import re
 from typing import Dict, Any, List, Tuple, Optional
 import pandas as pd
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent
-from langchain.prompts import StringPromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain.schema import AgentAction, AgentFinish
 from langchain_openai import ChatOpenAI
 from langchain.tools import BaseTool
@@ -216,10 +216,15 @@ class CustomerVisualizationTool(BaseTool):
         except Exception as e:
             return f"Error in customer visualization: {str(e)}"
 
-class CustomerAgentPromptTemplate(StringPromptTemplate):
+class CustomerAgentPromptTemplate:
     """Custom prompt template for the customer shopping agent"""
     
-    template: str = """You are an intelligent customer shopping data analysis agent. You have access to the following tools:
+    def __init__(self, tools, tool_names):
+        self.tools = tools
+        self.tool_names = tool_names
+        self.template = PromptTemplate(
+            input_variables=["tools", "tool_names", "input", "agent_scratchpad"],
+            template="""You are an intelligent customer shopping data analysis agent. You have access to the following tools:
 
 {tools}
 
@@ -236,6 +241,7 @@ Final Answer: the final answer to the original input question
 
 Question: {input}
 Thought: {agent_scratchpad}"""
+        )
 
     def format(self, **kwargs) -> str:
         """Format the prompt"""
@@ -244,6 +250,8 @@ Thought: {agent_scratchpad}"""
         for action, observation in intermediate_steps:
             thoughts += f"\nAction: {action}\nObservation: {observation}\n"
         kwargs["agent_scratchpad"] = thoughts
+        kwargs["tools"] = self.tools
+        kwargs["tool_names"] = self.tool_names
         return self.template.format(**kwargs)
 
 class CustomerShoppingAgent:
@@ -285,31 +293,61 @@ class CustomerShoppingAgent:
     
     def _create_agent(self) -> LLMSingleActionAgent:
         """Create the agent with custom prompt"""
-        prompt = CustomerAgentPromptTemplate(
-            tools=self.tools,
-            tool_names=", ".join([tool.name for tool in self.tools])
-        )
-        
-        llm_chain = self.llm.bind(stop=["\nObservation:"])
-        
         tool_names = [tool.name for tool in self.tools]
         
-        def output_parser(llm_output: str) -> AgentAction | AgentFinish:
-            if "Final Answer:" in llm_output:
-                return AgentFinish(
-                    return_values={"output": llm_output.split("Final Answer:")[-1].strip()},
-                    log=llm_output,
-                )
-            
-            regex = r"Action: (.*?)[\n]*Action Input: (.*)"
-            match = re.search(regex, llm_output, re.DOTALL)
-            if not match:
-                raise ValueError(f"Could not parse LLM output: `{llm_output}`")
-            
-            action = match.group(1).strip()
-            action_input = match.group(2).strip(" ").strip('"')
-            
-            return AgentAction(tool=action, tool_input=action_input, log=llm_output)
+        # Create prompt template using the modern LangChain approach
+        from langchain.prompts import PromptTemplate
+        
+        prompt_template = PromptTemplate(
+            input_variables=["tools", "tool_names", "input", "agent_scratchpad"],
+            template="""You are an intelligent customer shopping data analysis agent. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Question: {input}
+Thought: {agent_scratchpad}"""
+        )
+        
+        # Create LLM chain with prompt
+        from langchain.chains import LLMChain
+        llm_chain = LLMChain(
+            llm=self.llm,
+            prompt=prompt_template
+        )
+        
+        # Create a custom output parser that matches our prompt format
+        from langchain.agents import AgentOutputParser
+        
+        class CustomOutputParser(AgentOutputParser):
+            def parse(self, llm_output: str) -> AgentAction | AgentFinish:
+                if "Final Answer:" in llm_output:
+                    return AgentFinish(
+                        return_values={"output": llm_output.split("Final Answer:")[-1].strip()},
+                        log=llm_output,
+                    )
+                
+                regex = r"Action: (.*?)[\n]*Action Input: (.*)"
+                match = re.search(regex, llm_output, re.DOTALL)
+                if not match:
+                    raise ValueError(f"Could not parse LLM output: `{llm_output}`")
+                
+                action = match.group(1).strip()
+                action_input = match.group(2).strip(" ").strip('"')
+                
+                return AgentAction(tool=action, tool_input=action_input, log=llm_output)
+        
+        output_parser = CustomOutputParser()
         
         return LLMSingleActionAgent(
             llm_chain=llm_chain,
