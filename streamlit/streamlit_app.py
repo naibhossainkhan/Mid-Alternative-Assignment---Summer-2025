@@ -5,6 +5,7 @@ Demonstrates Agentic AI workflow with natural language query processing
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -138,10 +139,13 @@ def load_data():
             st.exception(e)
             return None, None
         
-        # Additional optimization for Streamlit display
+        # Additional optimization for Streamlit display with Arrow compatibility
         if cleaned_data is not None:
-            # Convert datetime to string for display compatibility
+            # Handle datetime columns - convert to string for Arrow compatibility
             if 'invoice_date' in cleaned_data.columns:
+                # Convert datetime to string format for Arrow compatibility
+                cleaned_data['invoice_date_str'] = cleaned_data['invoice_date'].dt.strftime('%Y-%m-%d')
+                # Keep original datetime for calculations but create a display version
                 cleaned_data['invoice_date_display'] = cleaned_data['invoice_date'].dt.strftime('%Y-%m-%d')
             
             # Ensure all categorical columns are strings for Arrow compatibility
@@ -150,7 +154,7 @@ def load_data():
                 if col in cleaned_data.columns:
                     cleaned_data[col] = cleaned_data[col].astype('string')
             
-            # Convert numeric columns to appropriate types
+            # Convert numeric columns to appropriate types for Arrow
             numeric_columns = ['quantity', 'price', 'total_amount', 'age', 'month', 'year', 'quarter', 'customer_id']
             for col in numeric_columns:
                 if col in cleaned_data.columns:
@@ -159,11 +163,22 @@ def load_data():
                     elif cleaned_data[col].dtype == 'float64':
                         cleaned_data[col] = cleaned_data[col].astype('float32')
             
-            # Handle any remaining object columns
+            # Handle any remaining object columns - convert to string
             object_columns = cleaned_data.select_dtypes(include=['object']).columns
             for col in object_columns:
-                if col != 'invoice_date' and col != 'invoice_date_display':
+                if col not in ['invoice_date', 'invoice_date_display', 'invoice_date_str']:
                     cleaned_data[col] = cleaned_data[col].astype('string')
+            
+            # Create a Streamlit-compatible copy for display
+            display_data = cleaned_data.copy()
+            
+            # Convert datetime columns to string for display
+            datetime_columns = display_data.select_dtypes(include=['datetime64']).columns
+            for col in datetime_columns:
+                display_data[col] = display_data[col].dt.strftime('%Y-%m-%d')
+            
+            # Store both versions
+            cleaned_data._display_data = display_data
         
         return loader, cleaned_data
     except Exception as e:
@@ -515,11 +530,28 @@ def main():
         # Data preview
         st.markdown("### 📊 Data Preview")
         preview_rows = st.slider("Number of rows to display:", 5, 50, 10)
-        st.dataframe(data.head(preview_rows), use_container_width=True)
+        
+        # Use display data for preview to avoid Arrow serialization issues
+        if hasattr(data, '_display_data'):
+            display_data = data._display_data
+        else:
+            display_data = data.copy()
+            # Convert datetime columns to string for display
+            datetime_columns = display_data.select_dtypes(include=['datetime64']).columns
+            for col in datetime_columns:
+                display_data[col] = display_data[col].dt.strftime('%Y-%m-%d')
+        
+        st.dataframe(display_data.head(preview_rows), use_container_width=True)
         
         # Statistical summary
         st.markdown("### 📈 Statistical Summary")
-        st.dataframe(data.describe(), use_container_width=True)
+        
+        # Create a numeric-only dataframe for describe() to avoid Arrow issues
+        numeric_data = data.select_dtypes(include=[np.number])
+        if not numeric_data.empty:
+            st.dataframe(numeric_data.describe(), use_container_width=True)
+        else:
+            st.info("No numeric columns available for statistical summary")
         
         # Data quality check
         st.markdown("### 🔍 Data Quality Check")
@@ -536,7 +568,10 @@ def main():
         
         with col2:
             st.markdown("**Data Types:**")
-            st.dataframe(data.dtypes.to_frame('Data Type'))
+            # Convert dtypes to string to avoid Arrow serialization issues
+            dtypes_df = data.dtypes.to_frame('Data Type')
+            dtypes_df['Data Type'] = dtypes_df['Data Type'].astype('string')
+            st.dataframe(dtypes_df, use_container_width=True)
         
         # AI-generated dataset summary
         if narrative_gen:
