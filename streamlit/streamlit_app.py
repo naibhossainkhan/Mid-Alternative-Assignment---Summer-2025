@@ -64,7 +64,25 @@ st.markdown("""
 def load_data():
     """Load and cache the customer shopping data with Streamlit optimization"""
     try:
-        loader, cleaned_data = load_and_prepare_customer_data("data/customer_shopping_data.csv")
+        # Try multiple possible paths for the data file
+        possible_paths = [
+            "data/customer_shopping_data.csv",
+            "../data/customer_shopping_data.csv",
+            "./data/customer_shopping_data.csv",
+            "customer_shopping_data.csv"
+        ]
+        
+        data_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                data_path = path
+                break
+        
+        if data_path is None:
+            st.error("Data file not found. Please ensure customer_shopping_data.csv is in the data/ directory.")
+            return None, None
+        
+        loader, cleaned_data = load_and_prepare_customer_data(data_path)
         
         # Additional optimization for Streamlit display
         if cleaned_data is not None:
