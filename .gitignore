@@ -195,6 +195,9 @@ logs/
 data/raw/
 data/processed/
 
+# Allow specific data files for the project
+!data/customer_shopping_data.csv
+
 # Model files
 *.pkl
 *.joblib
