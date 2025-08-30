@@ -31,9 +31,10 @@ class CustomerDataAnalysisTool(BaseTool):
     name: str = "customer_data_analysis"
     description: str = "Perform customer shopping data analysis operations like filtering, grouping, and aggregating data"
     args_schema: type = QueryInput
+    data: pd.DataFrame = Field(default=None, description="Customer shopping data")
     
-    def __init__(self, data: pd.DataFrame):
-        super().__init__()
+    def __init__(self, data: pd.DataFrame, **kwargs):
+        super().__init__(**kwargs)
         self.data = data
     
     def _run(self, query: str) -> str:
@@ -178,9 +179,10 @@ class CustomerVisualizationTool(BaseTool):
     name: str = "customer_visualization"
     description: str = "Create charts and visualizations based on customer shopping data analysis results"
     args_schema: type = QueryInput
+    visualizer: Any = Field(default=None, description="Visualization object")
     
-    def __init__(self, visualizer):
-        super().__init__()
+    def __init__(self, visualizer, **kwargs):
+        super().__init__(**kwargs)
         self.visualizer = visualizer
     
     def _run(self, query: str) -> str:

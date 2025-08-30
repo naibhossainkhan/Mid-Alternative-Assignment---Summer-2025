@@ -348,7 +348,14 @@ def main():
             # Initialize AI agent
             try:
                 visualizer = DataVisualizer()
-                agent = CustomerShoppingAgent(data, visualizer, narrative_gen)
+                
+                # Check if OpenAI API key is available
+                if not os.getenv('OPENAI_API_KEY'):
+                    st.warning("⚠️ OpenAI API key not found. AI Agent features will be limited.")
+                    st.info("To enable full AI features, set your OPENAI_API_KEY environment variable.")
+                    agent = None
+                else:
+                    agent = CustomerShoppingAgent(data, visualizer, narrative_gen)
                 
                 st.markdown("### Natural Language Query Interface")
                 st.markdown("Ask questions about your data in natural language:")
@@ -361,10 +368,14 @@ def main():
                 
                 if st.button("🚀 Analyze with AI Agent"):
                     if query:
-                        with st.spinner("AI Agent is processing your query..."):
-                            result = agent.process_query(query)
-                            
-                            if result["success"]:
+                        if agent is None:
+                            st.error("AI Agent is not available. Please check your API configuration.")
+                        else:
+                            with st.spinner("AI Agent is processing your query..."):
+                                try:
+                                    result = agent.process_query(query)
+                                    
+                                    if result.get("success", False):
                                 st.success("✅ Analysis completed successfully!")
                                 
                                 # Display results
@@ -384,7 +395,8 @@ def main():
                                 
                                 # Generate visualization
                                 st.markdown("### 📈 Generated Visualization")
-                                viz_result = agent.generate_visualization_pipeline(query)
+                                try:
+                                    viz_result = agent.generate_visualization_pipeline(query)
                                 
                                 if viz_result["chart_type"] == "line":
                                     fig = visualizer.create_line_chart(
@@ -421,9 +433,17 @@ def main():
                                 
                                 st.plotly_chart(fig, use_container_width=True)
                                 
+                                except Exception as viz_error:
+                                    st.error(f"Error generating visualization: {viz_error}")
+                                    st.info("The analysis was successful, but visualization generation failed.")
+                                    
+                            except Exception as agent_error:
+                                st.error(f"❌ Analysis failed: {agent_error}")
+                                st.info("Please try a different query or check your API configuration.")
+                                
                             else:
                                 st.error("❌ Analysis failed. Please try a different query.")
-                                st.write(result["agent_response"])
+                                st.write(result.get("agent_response", "No response available"))
                     else:
                         st.warning("Please enter a query to analyze.")
                 
@@ -444,6 +464,9 @@ def main():
                 
             except Exception as e:
                 st.error(f"Error initializing AI agent: {e}")
+                st.info("This might be due to missing API keys or network issues.")
+                st.info("You can still use the dashboard and data explorer features.")
+                agent = None
         else:
             st.warning("AI components not available. Please check your API configuration.")
     
