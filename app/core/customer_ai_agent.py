@@ -28,9 +28,9 @@ class QueryInput(BaseModel):
 class CustomerDataAnalysisTool(BaseTool):
     """Tool for performing customer shopping data analysis operations"""
     
-    name = "customer_data_analysis"
-    description = "Perform customer shopping data analysis operations like filtering, grouping, and aggregating data"
-    args_schema = QueryInput
+    name: str = "customer_data_analysis"
+    description: str = "Perform customer shopping data analysis operations like filtering, grouping, and aggregating data"
+    args_schema: type = QueryInput
     
     def __init__(self, data: pd.DataFrame):
         super().__init__()
