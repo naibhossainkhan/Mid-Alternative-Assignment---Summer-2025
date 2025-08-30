@@ -32,30 +32,6 @@ st.set_page_config(
 # Custom CSS
 st.markdown("""
 <style>
-    /* Global text color improvements */
-    * {
-        color: #1f2937 !important;
-    }
-    
-    /* Set white background only for main content area, not sidebar */
-    .main {
-        background-color: #ffffff !important;
-    }
-    
-    .block-container {
-        background-color: #ffffff !important;
-    }
-    
-    /* Main content area only */
-    .main .block-container {
-        background-color: #ffffff !important;
-    }
-    
-    /* Exclude sidebar from white background */
-    .css-1d391kg {
-        background-color: #f8f9fa !important;
-    }
-    
     /* Main headers */
     .main-header {
         font-size: 3rem;
@@ -64,6 +40,99 @@ st.markdown("""
         margin-bottom: 2rem;
         font-weight: 700;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Sub headers */
+    .sub-header {
+        font-size: 1.5rem;
+        color: #2ca02c !important;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    /* Metric cards */
+    .metric-card {
+        background-color: #f0f2f6;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border-left: 4px solid #1f77b4;
+        margin: 0.5rem 0;
+    }
+    
+    /* AI insight boxes */
+    .ai-insight {
+        background-color: #e8f4fd;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border-left: 4px solid #ff7f0e;
+        margin: 1rem 0;
+    }
+    
+    /* Chart containers */
+    .chart-container {
+        background-color: #ffffff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e1e5e9;
+        margin: 1rem 0;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Main content area */
+    .main .block-container {
+        background-color: #ffffff !important;
+    }
+    
+    /* Streamlit elements styling */
+    .stButton > button {
+        background-color: #1f77b4 !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .stButton > button:hover {
+        background-color: #1565c0 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    }
+    
+    .stSelectbox > div > div {
+        border-radius: 0.5rem !important;
+    }
+    
+    .stTextInput > div > div > input {
+        border-radius: 0.5rem !important;
+    }
+    
+    /* Chart styling */
+    .js-plotly-plot {
+        border-radius: 0.5rem !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Metric styling */
+    .stMetric {
+        background-color: #f8f9fa !important;
+        padding: 1rem !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #e9ecef !important;
+    }
+    
+    .stMetric > div > div > div {
+        color: #1f77b4 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Sidebar improvements */
+    .css-1d391kg {
+        background-color: #f8f9fa !important;
+        border-right: 1px solid #e9ecef !important;
     }
     
     /* Mobile responsive header */
