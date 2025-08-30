@@ -69,6 +69,8 @@ def load_data():
             "data/customer_shopping_data.csv",
             "../data/customer_shopping_data.csv",
             "./data/customer_shopping_data.csv",
+            os.path.join(os.path.dirname(__file__), "..", "data", "customer_shopping_data.csv"),
+            os.path.join(os.getcwd(), "data", "customer_shopping_data.csv"),
             "customer_shopping_data.csv"
         ]
         
@@ -76,13 +78,23 @@ def load_data():
         for path in possible_paths:
             if os.path.exists(path):
                 data_path = path
+                st.info(f"Found data file at: {data_path}")
                 break
         
         if data_path is None:
-            st.error("Data file not found. Please ensure customer_shopping_data.csv is in the data/ directory.")
+            st.error(f"Data file not found. Tried the following paths:")
+            for path in possible_paths:
+                st.write(f"- {path}")
+            st.error("Please ensure customer_shopping_data.csv is in the data/ directory.")
             return None, None
         
-        loader, cleaned_data = load_and_prepare_customer_data(data_path)
+        st.success(f"Loading data from: {data_path}")
+        try:
+            loader, cleaned_data = load_and_prepare_customer_data(data_path)
+        except Exception as e:
+            st.error(f"Error in load_and_prepare_customer_data: {e}")
+            st.exception(e)
+            return None, None
         
         # Additional optimization for Streamlit display
         if cleaned_data is not None:
@@ -205,10 +217,41 @@ def main():
     
     # Load data
     with st.spinner("Loading data..."):
-        loader, data = load_data()
+        try:
+            loader, data = load_data()
+        except Exception as e:
+            st.error(f"Error during data loading: {e}")
+            st.exception(e)
+            return
     
     if data is None:
         st.error("Failed to load data. Please check the data file.")
+        st.info("Troubleshooting tips:")
+        st.write("1. Make sure the data file exists in the data/ directory")
+        st.write("2. Check that the file is named 'customer_shopping_data.csv'")
+        st.write("3. Ensure you have read permissions for the file")
+        st.write("4. Try running the app from the project root directory")
+        
+        # Show debug information
+        with st.expander("Debug Information"):
+            st.write(f"Current working directory: {os.getcwd()}")
+            st.write(f"Script location: {__file__}")
+            
+            # Check file existence
+            possible_paths = [
+                "data/customer_shopping_data.csv",
+                "../data/customer_shopping_data.csv",
+                "./data/customer_shopping_data.csv",
+                os.path.join(os.path.dirname(__file__), "..", "data", "customer_shopping_data.csv"),
+                os.path.join(os.getcwd(), "data", "customer_shopping_data.csv"),
+                "customer_shopping_data.csv"
+            ]
+            
+            st.write("File existence check:")
+            for path in possible_paths:
+                exists = os.path.exists(path)
+                st.write(f"- {path}: {'✅' if exists else '❌'}")
+        
         return
     
     # Initialize AI components
