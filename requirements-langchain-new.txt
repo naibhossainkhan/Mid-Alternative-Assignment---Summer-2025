@@ -1,5 +1,5 @@
-# Minimal requirements for Streamlit Cloud deployment
-# This file contains only the essential dependencies needed for the app to run
+# Requirements for LangChain version with newer dependencies
+# This file uses newer versions that might have better wheel support
 
 # Core Streamlit
 streamlit>=1.28.0
@@ -16,9 +16,8 @@ seaborn>=0.11.0
 # AI/ML
 openai>=1.99.9
 google-generativeai>=0.3.0
-# tiktoken>=0.5.0  # Removed due to compilation issues on Streamlit Cloud
 
-# LangChain and AI Agents (newer versions with better wheel support)
+# LangChain and AI Agents (newer versions)
 langchain>=0.1.0
 langchain-openai>=0.3.0
 langchain-community>=0.0.10
