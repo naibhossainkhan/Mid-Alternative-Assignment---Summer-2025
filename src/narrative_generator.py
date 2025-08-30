@@ -216,8 +216,8 @@ class NarrativeGenerator:
                 Note: Using local analysis mode. The core data analysis functionality is fully operational.
                 """
             elif hasattr(self.ai_provider, 'generate_content'):
-                # Use Gemini directly
-                model = self.ai_provider.GenerativeModel('gemini-1.5-pro')
+                # Use Gemini 1.5 Flash (free version)
+                model = self.ai_provider.GenerativeModel('gemini-1.5-flash')
                 response = model.generate_content(prompt)
                 return response.text
             else:

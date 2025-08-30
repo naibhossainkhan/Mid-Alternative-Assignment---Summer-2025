@@ -38,11 +38,15 @@ class CustomerDataAnalysisTool(BaseTool):
     def _run(self, query: str) -> str:
         """Execute customer data analysis based on natural language query"""
         try:
+            # Calculate total_amount from price * quantity
+            df = self.data.copy()
+            df['total_amount'] = df['price'] * df['quantity']
+            
             # Parse the query and generate pandas code
             pandas_code = self._generate_pandas_code(query)
             
             # Execute the code safely
-            local_vars = {'df': self.data, 'pd': pd}
+            local_vars = {'df': df, 'pd': pd}
             exec(pandas_code, globals(), local_vars)
             
             # Get the result
@@ -246,7 +250,7 @@ class CustomerShoppingAgent:
         elif model_type == 'gemini':
             from langchain_google_genai import ChatGoogleGenerativeAI
             self.llm = ChatGoogleGenerativeAI(
-                model="gemini-pro",
+                model="gemini-1.5-flash",
                 google_api_key=os.getenv('GOOGLE_API_KEY'),
                 temperature=0
             )
